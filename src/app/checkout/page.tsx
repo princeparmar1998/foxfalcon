@@ -179,8 +179,13 @@ export default function CheckoutPage() {
     }
   };
 
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push("/cart");
+    }
+  }, [items, router]);
+
   if (items.length === 0) {
-    router.push("/cart");
     return null;
   }
 
