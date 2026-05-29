@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 
 export default function AdminCustomersPage() {
@@ -51,9 +52,7 @@ export default function AdminCustomersPage() {
   const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/customers");
-      if (!res.ok) throw new Error("Failed to fetch customers");
-      const data = await res.json();
+      const data = await adminApi.getCustomers();
       setCustomers(data);
     } catch (err) {
       showToast.error("Failed to load customers", err);

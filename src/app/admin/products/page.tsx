@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { showToast } from "@/lib/toast";
-import Link from "next/link";
+import { adminApi } from "@/lib/api";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -61,9 +61,7 @@ export default function AdminProductsPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/products");
-      if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
+      const data = await adminApi.getProducts();
       setProducts(data);
     } catch (err) {
       showToast.error("Failed to load products", err);
@@ -86,23 +84,17 @@ export default function AdminProductsPage() {
 
     try {
       setSubmitting(true);
-      const res = await fetch("/api/admin/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          description,
-          price,
-          categoryName,
-          inventory,
-          images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop"],
-          sizes,
-          colors,
-          isFeatured,
-        }),
+      await adminApi.createProduct({
+        name,
+        description,
+        price,
+        categoryName,
+        inventory,
+        images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop"],
+        sizes,
+        colors,
+        isFeatured,
       });
-
-      if (!res.ok) throw new Error("Could not create product");
 
       showToast.success("Product created successfully!");
       setIsOpen(false);
@@ -130,11 +122,7 @@ export default function AdminProductsPage() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const res = await fetch(`/api/admin/products/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Could not delete product");
-      
+      await adminApi.deleteProduct(id);
       showToast.success("Product deleted successfully");
       fetchProducts();
     } catch (err) {
@@ -344,16 +332,8 @@ export default function AdminProductsPage() {
                     const formData = new FormData();
                     formData.append('file', file);
                     try {
-                      const res = await fetch('/api/admin/products/upload', {
-                        method: 'POST',
-                        body: formData,
-                      });
-                      if (res.ok) {
-                        const data = await res.json();
-                        setImages((prev) => [...prev, data.url]);
-                      } else {
-                        showToast.error(`Image upload failed for ${file.name}`);
-                      }
+                      const data = await adminApi.uploadProductImage(formData);
+                      setImages((prev) => [...prev, data.url]);
                     } catch (err) {
                       showToast.error(`Image upload error for ${file.name}`, err);
                     }

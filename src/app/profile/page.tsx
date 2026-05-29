@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { showToast } from "@/lib/toast";
+import { userApi } from "@/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -86,9 +87,7 @@ export default function ProfilePage() {
     const fetchOrders = async () => {
       try {
         setLoadingOrders(true);
-        const res = await fetch("/api/user/orders");
-        if (!res.ok) throw new Error("Failed to fetch orders");
-        const data = await res.json();
+        const data = await userApi.getOrders();
         setOrders(data);
       } catch (err) {
         showToast.error("Could not load orders", err);
@@ -100,9 +99,7 @@ export default function ProfilePage() {
     const fetchAddresses = async () => {
       try {
         setLoadingAddresses(true);
-        const res = await fetch("/api/user/addresses");
-        if (!res.ok) throw new Error("Failed to fetch addresses");
-        const data = await res.json();
+        const data = await userApi.getAddresses();
         setAddresses(data);
       } catch (err) {
         showToast.error("Could not load addresses", err);
@@ -131,12 +128,7 @@ export default function ProfilePage() {
     if (!nameValue.trim() || nameValue === session.user?.name) return;
     try {
       setSavingName(true);
-      const res = await fetch("/api/user/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: nameValue }),
-      });
-      if (!res.ok) throw new Error("Failed to update name");
+      await userApi.updateProfile({ name: nameValue });
       await updateSession({ name: nameValue });
       showToast.success("Name updated successfully!");
     } catch (err) {
@@ -150,13 +142,7 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       setSavingAddress(true);
-      const res = await fetch("/api/user/addresses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newAddress),
-      });
-      if (!res.ok) throw new Error("Failed to save address");
-      const saved = await res.json();
+      const saved = await userApi.createAddress(newAddress);
       setAddresses((prev) => newAddress.isDefault 
         ? [saved, ...prev.map(a => ({ ...a, isDefault: false }))]
         : [...prev, saved]
@@ -174,8 +160,7 @@ export default function ProfilePage() {
   const handleDeleteAddress = async (id: string) => {
     if (!confirm("Are you sure you want to delete this address?")) return;
     try {
-      const res = await fetch(`/api/user/addresses?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
+      await userApi.deleteAddress(id);
       setAddresses((prev) => prev.filter(a => a.id !== id));
       showToast.success("Address deleted");
     } catch (err) {

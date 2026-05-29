@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
+import { authApi } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
@@ -31,22 +32,12 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create account");
-      }
-
+      const data = await authApi.register({ name, email, password });
       toast.success(data.message || "Account successfully created!");
       router.push("/login");
     } catch (err: any) {
-      toast.error(err.message || "An unexpected error occurred.");
+      const errorMessage = err.response?.data?.error || err.message || "An unexpected error occurred.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

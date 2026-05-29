@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
+import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 import Link from "next/link";
 
@@ -37,9 +38,7 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     try {
       setLoadingStats(true);
-      const res = await fetch("/api/admin/stats");
-      if (!res.ok) throw new Error("Failed to fetch stats");
-      const data = await res.json();
+      const data = await adminApi.getStats();
       setStats(data);
     } catch (err) {
       showToast.error("Failed to load dashboard stats", err);
@@ -51,9 +50,7 @@ export default function AdminDashboard() {
   const fetchOrders = async () => {
     try {
       setLoadingOrders(true);
-      const res = await fetch("/api/admin/orders");
-      if (!res.ok) throw new Error("Failed to fetch orders");
-      const data = await res.json();
+      const data = await adminApi.getOrders();
       setOrders(data.slice(0, 6)); // Show last 6
     } catch (err) {
       showToast.error("Failed to load recent orders", err);

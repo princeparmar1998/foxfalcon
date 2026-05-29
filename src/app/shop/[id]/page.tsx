@@ -25,6 +25,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { productsApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
@@ -41,9 +42,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     async function fetchProduct() {
       try {
         setLoading(true);
-        const res = await fetch(`/api/products/${params.id}`);
-        if (!res.ok) throw new Error("Product not found");
-        const data = await res.json();
+        const data = await productsApi.getById(params.id);
         setProduct(data);
         if (data.sizes && data.sizes.length > 0) {
           setSelectedSize(data.sizes[0]);

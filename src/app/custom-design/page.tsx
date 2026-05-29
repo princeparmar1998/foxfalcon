@@ -9,6 +9,8 @@ import Image from "next/image";
 import { useCart } from "@/hooks/use-cart";
 import { showToast } from "@/lib/toast";
 
+import { adminApi } from "@/lib/api";
+
 export default function CustomDesignPage() {
   const cart = useCart();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -37,18 +39,9 @@ export default function CustomDesignPage() {
         // Upload to server using the products upload api endpoint
         const formData = new FormData();
         formData.append("file", file);
-        const res = await fetch("/api/admin/products/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setSelectedImage(data.url);
-          showToast.success("Design uploaded successfully!");
-        } else {
-          showToast.error("Failed to upload image. Please try again.");
-        }
+        const data = await adminApi.uploadProductImage(formData);
+        setSelectedImage(data.url);
+        showToast.success("Design uploaded successfully!");
       } catch (err) {
         showToast.error("An error occurred during upload.");
         console.error(err);

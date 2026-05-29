@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { BarChart3, TrendingUp, ShoppingBag, Users, DollarSign, Package, Loader2 } from "lucide-react";
+import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 
 export default function AdminAnalyticsPage() {
@@ -13,12 +14,10 @@ export default function AdminAnalyticsPage() {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [statsRes, ordersRes] = await Promise.all([
-          fetch("/api/admin/stats"),
-          fetch("/api/admin/orders"),
+        const [statsData, ordersData] = await Promise.all([
+          adminApi.getStats(),
+          adminApi.getOrders(),
         ]);
-        const statsData = await statsRes.json();
-        const ordersData = await ordersRes.json();
         setStats(statsData);
         setOrders(ordersData);
       } catch (err) {

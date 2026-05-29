@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { showToast } from "@/lib/toast";
+import { userApi, checkoutApi } from "@/lib/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,9 +67,7 @@ export default function CheckoutPage() {
     const load = async () => {
       try {
         setLoadingAddresses(true);
-        const res = await fetch("/api/user/addresses");
-        if (!res.ok) return;
-        const data = await res.json();
+        const data = await userApi.getAddresses();
         setAddresses(data);
         const def = data.find((a: any) => a.isDefault) || data[0];
         if (def) {
@@ -129,37 +128,23 @@ export default function CheckoutPage() {
         }
 
         const fullName = `${firstName} ${lastName}`.trim();
-        const addrRes = await fetch("/api/user/addresses", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            street: `${fullName ? fullName + ", " : ""}${street}`,
-            city,
-            state,
-            postalCode,
-            country,
-            isDefault: addresses.length === 0 || saveAddress,
-          }),
+        const saved = await userApi.createAddress({
+          street: `${fullName ? fullName + ", " : ""}${street}`,
+          city,
+          state,
+          postalCode,
+          country,
+          isDefault: addresses.length === 0 || saveAddress,
         });
-
-        if (!addrRes.ok) throw new Error("Could not save address");
-        const saved = await addrRes.json();
         addressId = saved.id;
       }
 
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          items, 
-          addressId,
-          paymentMethod,
-          cardDetails: paymentMethod === "CARD" ? { cardNumber, cardExpiry, cardCvc, cardName } : null
-        }),
+      const data = await checkoutApi.createSession({ 
+        items, 
+        addressId,
+        paymentMethod,
+        cardDetails: paymentMethod === "CARD" ? { cardNumber, cardExpiry, cardCvc, cardName } : null
       });
-
-      if (!response.ok) throw new Error("Checkout failed");
-      const data = await response.json();
 
       if (data.success) {
         showToast.success(

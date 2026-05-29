@@ -38,6 +38,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 
 export default function AdminOrdersPage() {
@@ -51,9 +52,7 @@ export default function AdminOrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/orders");
-      if (!res.ok) throw new Error("Could not load orders");
-      const data = await res.json();
+      const data = await adminApi.getOrders();
       setOrders(data);
     } catch (err) {
       showToast.error("Failed to load orders", err);
@@ -70,17 +69,9 @@ export default function AdminOrdersPage() {
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     const toastId = showToast.loading(`Updating order status to ${newStatus}...`);
     try {
-      const res = await fetch(`/api/admin/orders/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (!res.ok) throw new Error("Failed to update status");
-      
+      await adminApi.updateOrderStatus(id, newStatus);
       showToast.dismiss(toastId);
       showToast.success(`Order status successfully updated to ${newStatus}!`);
-      
       fetchOrders();
     } catch (err) {
       showToast.dismiss(toastId);
