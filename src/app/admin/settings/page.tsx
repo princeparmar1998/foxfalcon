@@ -1,0 +1,163 @@
+"use client";
+
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useSession } from "next-auth/react";
+import { Settings, ShieldAlert, Database, Globe, Bell, Palette, Save } from "lucide-react";
+
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{children}</label>
+);
+
+export default function AdminSettingsPage() {
+  const { data: session } = useSession();
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-black tracking-tighter">SETTINGS</h1>
+        <p className="text-muted-foreground">Manage your store configuration and preferences.</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+
+          {/* Store Info */}
+          <Card className="p-6 border-border">
+            <h3 className="font-bold flex items-center gap-2 mb-6">
+              <Globe className="w-4 h-4 text-primary" /> Store Information
+            </h3>
+            <div className="space-y-4 max-w-md">
+              <div className="space-y-2">
+                <Label>Store Name</Label>
+                <Input defaultValue="Fox Falcon" className="bg-muted/30" />
+              </div>
+              <div className="space-y-2">
+                <Label>Store URL</Label>
+                <Input defaultValue={process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"} disabled className="bg-muted/30 opacity-60" />
+              </div>
+              <div className="space-y-2">
+                <Label>Support Email</Label>
+                <Input defaultValue="support@foxfalcon.com" className="bg-muted/30" />
+              </div>
+              <Button className="bg-primary hover:bg-primary/90 font-bold gap-2">
+                <Save className="w-4 h-4" /> Save Changes
+              </Button>
+            </div>
+          </Card>
+
+          {/* Notification Settings */}
+          <Card className="p-6 border-border">
+            <h3 className="font-bold flex items-center gap-2 mb-6">
+              <Bell className="w-4 h-4 text-primary" /> Notification Preferences
+            </h3>
+            <div className="space-y-4">
+              {[
+                { label: "New Order Notifications", desc: "Get notified when a new order is placed" },
+                { label: "Low Stock Alerts", desc: "Alert when product inventory drops below 10" },
+                { label: "Customer Sign-up Alerts", desc: "Notify on new user registrations" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border">
+                  <div>
+                    <p className="font-bold text-sm">{item.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                  </div>
+                  <input type="checkbox" defaultChecked className="w-4 h-4 accent-primary cursor-pointer" />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Appearance */}
+          <Card className="p-6 border-border">
+            <h3 className="font-bold flex items-center gap-2 mb-6">
+              <Palette className="w-4 h-4 text-primary" /> Appearance
+            </h3>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Theme</Label>
+                <div className="flex gap-3">
+                  {["Dark", "Light", "System"].map((t) => (
+                    <button
+                      key={t}
+                      className={`px-4 py-2 rounded-lg border-2 text-sm font-bold transition-all ${
+                        t === "Dark"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Right column */}
+        <div className="space-y-6">
+          {/* Admin Profile */}
+          <Card className="p-6 border-border">
+            <h3 className="font-bold flex items-center gap-2 mb-6">
+              <Settings className="w-4 h-4 text-primary" /> Admin Profile
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-black">
+                  {session?.user?.name?.[0]?.toUpperCase() || "A"}
+                </div>
+                <div>
+                  <p className="font-bold text-sm">{session?.user?.name || "Admin"}</p>
+                  <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="border-primary text-primary text-[10px] font-black uppercase tracking-widest gap-1">
+                <ShieldAlert className="w-3 h-3" /> Admin Access
+              </Badge>
+            </div>
+          </Card>
+
+          {/* Database Status */}
+          <Card className="p-6 border-border">
+            <h3 className="font-bold flex items-center gap-2 mb-4">
+              <Database className="w-4 h-4 text-primary" /> Database
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Provider</span>
+                <Badge variant="outline" className="text-[10px] font-black border-green-500 text-green-500">PostgreSQL</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">ORM</span>
+                <span className="font-bold">Prisma 7</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Status</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="font-bold text-green-500 text-xs">Connected</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Host</span>
+                <span className="font-bold text-xs">Neon (Serverless)</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Danger Zone */}
+          <Card className="p-6 border-destructive/30 bg-destructive/5">
+            <h3 className="font-bold text-destructive mb-4">Danger Zone</h3>
+            <p className="text-xs text-muted-foreground mb-4">These actions are irreversible. Proceed with caution.</p>
+            <Button variant="outline" className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground font-bold" disabled>
+              Clear All Orders
+            </Button>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
