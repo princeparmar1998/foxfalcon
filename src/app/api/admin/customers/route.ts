@@ -42,10 +42,10 @@ export async function GET() {
     });
 
     // Calculate total spent per customer
-    const enriched = customers.map((c) => ({
+    const enriched = customers.map((c: any) => ({
       ...c,
       totalSpent: c.orders
-        .reduce((sum, o) => sum + parseFloat(o.totalAmount.toString()), 0)
+        .reduce((sum: number, o: any) => sum + parseFloat(o.totalAmount.toString()), 0)
         .toFixed(2),
       orders: undefined, // remove raw orders from response
     }));
