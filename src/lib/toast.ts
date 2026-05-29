@@ -26,17 +26,21 @@ export const showToast = {
    * Displays an error toast notification.
    * Can automatically parse raw strings, Error objects, or API error payloads.
    */
-  error: (message: string, error?: any) => {
+  error: (message: string, error?: unknown) => {
     let errorDescription = "";
     if (error) {
       if (typeof error === "string") {
         errorDescription = error;
       } else if (error instanceof Error) {
         errorDescription = error.message;
-      } else if (error.message) {
-        errorDescription = error.message;
-      } else if (error.error) {
-        errorDescription = error.error;
+      } else if (error && typeof error === "object") {
+        if ("message" in error) {
+          errorDescription = String((error as { message?: unknown }).message || "");
+        } else if ("error" in error) {
+          errorDescription = String((error as { error?: unknown }).error || "");
+        } else {
+          errorDescription = JSON.stringify(error);
+        }
       } else {
         errorDescription = JSON.stringify(error);
       }
@@ -84,7 +88,7 @@ export const showToast = {
     messages: {
       loading: string;
       success: string | ((data: T) => string);
-      error: string | ((error: any) => string);
+      error: string | ((error: unknown) => string);
     }
   ) => {
     return toast.promise(promise, messages);

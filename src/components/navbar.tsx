@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -72,8 +73,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center gap-3 group">
-          <div className="w-14 h-14 bg-black rounded-full group-hover:scale-110 transition-transform flex items-center justify-center overflow-hidden border border-border">
-            <img src="/logo-icon.png" alt="Fox Falcon Logo" className="w-full h-full object-cover" />
+          <div className="w-14 h-14 bg-black rounded-full group-hover:scale-110 transition-transform flex items-center justify-center overflow-hidden border border-border relative">
+            <Image src="/logo-icon.png" width={56} height={56} alt="Fox Falcon Logo" className="object-cover" />
           </div>
           <span className="hidden sm:inline-block font-sans uppercase text-3xl font-black">
             FOX <span className="text-primary">FALCON</span>
@@ -83,7 +84,7 @@ const Navbar = () => {
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
           {activeLinks.map((link) => {
-            const LinkIcon = (link as any).icon;
+            const LinkIcon = (link as { icon?: React.ComponentType<{ className?: string }> }).icon;
             return (
               <Link
                 key={link.href}
@@ -232,7 +233,7 @@ const Navbar = () => {
                 </div>
               )}
               {activeLinks.map((link) => {
-                const LinkIcon = (link as any).icon;
+                const LinkIcon = (link as { icon?: React.ComponentType<{ className?: string }> }).icon;
                 return (
                   <Link
                     key={link.href}

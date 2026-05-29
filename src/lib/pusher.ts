@@ -19,7 +19,7 @@ export const pusherServer = (appId && key && secret && appId !== "your-pusher-id
 
 // Defensive check to avoid browser-side hydration crashes if key is unconfigured or a placeholder
 export const pusherClient = (typeof window !== "undefined" && key && key !== "your-pusher-key")
-  ? new ((PusherClient as any).default || PusherClient)(
+  ? new ((PusherClient as unknown as { default?: typeof PusherClient }).default || PusherClient)(
       key,
       {
         cluster: cluster || "mt1",
