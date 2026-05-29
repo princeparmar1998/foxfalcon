@@ -18,6 +18,7 @@ import {
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 
+
 const Navbar = () => {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "ADMIN";
@@ -186,9 +187,9 @@ const Navbar = () => {
 
                 {/* Sign Out Section */}
                 <div className="flex justify-center pt-2">
-                  <Button 
+                  <Button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    variant="outline" 
+                    variant="outline"
                     className="rounded-full border-zinc-700 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 font-bold px-8 h-11 text-zinc-300 flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" /> Sign Out
