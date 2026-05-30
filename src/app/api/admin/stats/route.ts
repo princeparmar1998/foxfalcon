@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-    const isDev = process.env.NODE_ENV === "development";
+export const dynamic = "force-dynamic";
 
-    if (!isDev && (!session || session.user?.role !== "ADMIN")) {
+export async function GET(req: Request) {
+  try {
+    const session = await getSessionOrJwt(req);
+
+    if (!session || session.user?.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -16,7 +16,7 @@ export async function GET() {
     const revenueResult = await db.order.aggregate({
       _sum: { totalAmount: true },
       where: {
-        status: { in: ["DELIVERED", "SHIPPED", "PROCESSING"] },
+        status: { in: ["DELIVERED", "SHIPPED", "PROCESSING", "COMPLETED"] },
       },
     });
 
@@ -29,7 +29,7 @@ export async function GET() {
       _sum: { totalAmount: true },
       where: {
         createdAt: { gte: thirtyDaysAgo },
-        status: { in: ["DELIVERED", "SHIPPED", "PROCESSING"] },
+        status: { in: ["DELIVERED", "SHIPPED", "PROCESSING", "COMPLETED"] },
       },
     });
 
@@ -37,7 +37,7 @@ export async function GET() {
       _sum: { totalAmount: true },
       where: {
         createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
-        status: { in: ["DELIVERED", "SHIPPED", "PROCESSING"] },
+        status: { in: ["DELIVERED", "SHIPPED", "PROCESSING", "COMPLETED"] },
       },
     });
 

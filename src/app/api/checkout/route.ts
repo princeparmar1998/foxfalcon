@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionOrJwt(req);
 
     if (!session || !session.user) {
       return new NextResponse("Unauthorized", { status: 401 });

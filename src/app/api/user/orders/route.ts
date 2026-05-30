@@ -1,19 +1,26 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 
-// GET user's own orders
-export async function GET() {
+export const dynamic = "force-dynamic";
+
+// GET user's own orders, or all orders if admin calls with all=true
+export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionOrJwt(req);
 
     if (!session || !session.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const getAll = searchParams.get("all") === "true";
+    const isAdmin = (session.user as any).role === "ADMIN";
+
+    const whereClause = getAll && isAdmin ? {} : { userId: session.user.id };
+
     const orders = await db.order.findMany({
-      where: { userId: session.user.id },
+      where: whereClause,
       include: {
         items: {
           include: {
@@ -23,6 +30,12 @@ export async function GET() {
           },
         },
         address: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

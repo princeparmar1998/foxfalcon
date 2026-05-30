@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Search, 
-  MoreVertical, 
-  Eye, 
-  Truck, 
-  CheckCircle2, 
+import {
+  Search,
+  MoreVertical,
+  Eye,
+  Truck,
+  CheckCircle2,
   XCircle,
   Clock,
   Loader2,
@@ -16,13 +16,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import {
   DropdownMenu,
@@ -98,8 +98,8 @@ export default function AdminOrdersPage() {
         <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search orders by ID, name or email..." 
+            <Input
+              placeholder="Search orders by ID, name or email..."
               className="pl-10 bg-muted/30 border-border"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -138,7 +138,7 @@ export default function AdminOrdersPage() {
                     hour: "2-digit",
                     minute: "2-digit",
                   });
-                  
+
                   return (
                     <TableRow key={order.id} className="border-border hover:bg-muted/50 transition-colors group">
                       <TableCell className="font-black">{order.id}</TableCell>
@@ -149,18 +149,20 @@ export default function AdminOrdersPage() {
                       <TableCell className="text-xs text-muted-foreground">{orderDate}</TableCell>
                       <TableCell className="font-black text-primary">${parseFloat(order.totalAmount).toFixed(2)}</TableCell>
                       <TableCell>
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className={cn(
                             "text-[10px] font-black uppercase tracking-widest",
                             order.status === 'PROCESSING' && "border-primary text-primary",
-                            order.status === 'SHIPPED' && "border-secondary text-secondary",
+                            order.status === 'SHIPPED' && "border-blue-500 text-blue-500",
                             order.status === 'DELIVERED' && "border-green-500 text-green-500",
+                            order.status === 'COMPLETED' && "border-green-500 text-green-500",
                             order.status === 'PENDING' && "border-yellow-500 text-yellow-500",
-                            order.status === 'CANCELLED' && "border-red-500 text-red-500"
+                            order.status === 'CANCELLED' && "border-red-500 text-red-500",
+                            order.status === 'REJECTED' && "border-red-500 text-red-500"
                           )}
                         >
-                          {order.status}
+                          {order.status.replace('_', ' ')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -168,24 +170,38 @@ export default function AdminOrdersPage() {
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem 
-                              onClick={() => {
+                          <DropdownMenuContent align="end" className="w-56 z-[9999]">
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault();
                                 setSelectedOrder(order);
-                                setIsDetailsOpen(true);
-                              }} 
+                                setTimeout(() => {
+                                  setIsDetailsOpen(true);
+                                }, 100);
+                              }}
                               className="font-bold cursor-pointer"
                             >
                               <Eye className="w-4 h-4 mr-2" /> View Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'SHIPPED')} className="font-bold cursor-pointer">
-                              <Truck className="w-4 h-4 mr-2" /> Mark as Shipped
+                            <div className="h-px bg-muted my-1" />
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'PENDING')} className="font-bold cursor-pointer">
+                              <Clock className="w-4 h-4 mr-2 text-yellow-500" /> Mark as Pending
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'DELIVERED')} className="font-bold cursor-pointer">
-                              <CheckCircle2 className="w-4 h-4 mr-2" /> Mark as Delivered
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'COMPLETED')} className="font-bold cursor-pointer">
+                              <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> Mark as Complete
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'CANCELLED')} className="font-bold text-destructive cursor-pointer">
-                              <XCircle className="w-4 h-4 mr-2" /> Cancel Order
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'REJECTED')} className="font-bold text-destructive cursor-pointer">
+                              <XCircle className="w-4 h-4 mr-2 text-red-500" /> Mark as Rejected
+                            </DropdownMenuItem>
+                            <div className="h-px bg-muted my-1" />
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'SHIPPED')} className="font-bold cursor-pointer text-xs opacity-70">
+                              <Truck className="w-3.5 h-3.5 mr-2" /> (Legacy) Ship Order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'DELIVERED')} className="font-bold cursor-pointer text-xs opacity-70">
+                              <CheckCircle2 className="w-3.5 h-3.5 mr-2" /> (Legacy) Deliver Order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'CANCELLED')} className="font-bold cursor-pointer text-xs text-destructive opacity-70">
+                              <XCircle className="w-3.5 h-3.5 mr-2" /> (Legacy) Cancel Order
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -222,8 +238,20 @@ export default function AdminOrdersPage() {
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Order Status</span>
                     <div>
-                      <Badge variant="outline" className="text-[10px] font-black tracking-widest border-primary text-primary">
-                        {selectedOrder.status}
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] font-black tracking-widest uppercase",
+                          selectedOrder.status === 'PROCESSING' && "border-primary text-primary",
+                          selectedOrder.status === 'SHIPPED' && "border-blue-500 text-blue-500",
+                          selectedOrder.status === 'DELIVERED' && "border-green-500 text-green-500",
+                          selectedOrder.status === 'COMPLETED' && "border-green-500 text-green-500",
+                          selectedOrder.status === 'PENDING' && "border-yellow-500 text-yellow-500",
+                          selectedOrder.status === 'CANCELLED' && "border-red-500 text-red-500",
+                          selectedOrder.status === 'REJECTED' && "border-red-500 text-red-500"
+                        )}
+                      >
+                        {selectedOrder.status.replace('_', ' ')}
                       </Badge>
                     </div>
                   </div>

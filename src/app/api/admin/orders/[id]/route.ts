@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher";
+
+export const dynamic = "force-dynamic";
 
 export async function PATCH(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const isDev = process.env.NODE_ENV === "development";
+    const session = await getSessionOrJwt(req);
 
-    if (!isDev && (!session || session.user?.role !== "ADMIN")) {
+    if (!session || session.user?.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

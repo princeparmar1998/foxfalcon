@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-    const isDev = process.env.NODE_ENV === "development";
+export const dynamic = "force-dynamic";
 
-    if (!isDev && (!session || session.user?.role !== "ADMIN")) {
+export async function GET(req: Request) {
+  try {
+    const session = await getSessionOrJwt(req);
+
+    if (!session || session.user?.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -35,7 +35,12 @@ export async function GET() {
           select: { orders: true },
         },
         orders: {
-          select: { totalAmount: true },
+          select: {
+            id: true,
+            totalAmount: true,
+            status: true,
+            createdAt: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -47,7 +52,8 @@ export async function GET() {
       totalSpent: c.orders
         .reduce((sum: number, o: any) => sum + parseFloat(o.totalAmount.toString()), 0)
         .toFixed(2),
-      orders: undefined, // remove raw orders from response
+      orderHistory: c.orders, // keep the details of orders for the front-end modal
+      orders: undefined, // remove raw orders reference from response
     }));
 
     return NextResponse.json(enriched);

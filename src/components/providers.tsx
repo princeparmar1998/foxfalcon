@@ -9,7 +9,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <SessionProvider>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         {children}
-        <Toaster position="top-right" richColors />
+        <Toaster position="bottom-right" richColors />
       </ThemeProvider>
     </SessionProvider>
   );

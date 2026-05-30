@@ -20,6 +20,8 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+  COMPLETED
+  REJECTED
 }
 
 model User {

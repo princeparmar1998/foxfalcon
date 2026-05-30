@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
+    const session = await getSessionOrJwt(req);
+
+    if (!session || session.user?.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const products = await db.product.findMany({
       include: {
         category: true,
@@ -23,11 +30,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    const isDev = process.env.NODE_ENV === "development";
+    const session = await getSessionOrJwt(req);
 
-    // In local development, allow bypass so developers can test without manual DB injection of admin role
-    if (!isDev && (!session || session.user?.role !== "ADMIN")) {
+    if (!session || session.user?.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

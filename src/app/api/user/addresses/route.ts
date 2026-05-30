@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 
 // GET user's addresses
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionOrJwt(req);
 
     if (!session || !session.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -27,7 +26,7 @@ export async function GET() {
 // POST create a new address
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionOrJwt(req);
 
     if (!session || !session.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -70,7 +69,7 @@ export async function POST(req: Request) {
 // DELETE an address
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionOrJwt(req);
 
     if (!session || !session.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });

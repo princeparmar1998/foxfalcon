@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getSessionOrJwt } from "@/lib/jwt-auth";
 
 export async function GET(req: Request) {
   try {
@@ -31,7 +30,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getSessionOrJwt(req);
 
     if (!session || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });

@@ -183,9 +183,12 @@ export default function AdminCustomersPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             className="font-bold cursor-pointer"
-                            onClick={() => {
+                            onSelect={(e) => {
+                              e.preventDefault();
                               setSelectedCustomer(customer);
-                              setIsDetailsOpen(true);
+                              setTimeout(() => {
+                                setIsDetailsOpen(true);
+                              }, 100);
                             }}
                           >
                             <Eye className="w-4 h-4 mr-2" /> View Details
@@ -264,6 +267,47 @@ export default function AdminCustomersPage() {
                   </div>
                 )}
 
+                {/* Order History */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-primary" /> Order History
+                  </h4>
+                  {selectedCustomer.orderHistory?.length > 0 ? (
+                    <div className="space-y-2.5 max-h-[200px] overflow-y-auto pr-1">
+                      {selectedCustomer.orderHistory.map((order: any) => (
+                        <div key={order.id} className="flex justify-between items-center p-3 rounded-lg bg-muted/10 border border-border text-sm">
+                          <div>
+                            <span className="font-mono text-xs font-bold text-foreground block">{order.id.slice(0, 16)}...</span>
+                            <span className="text-[10px] text-muted-foreground block mt-0.5">
+                              {new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="font-black text-primary">${parseFloat(order.totalAmount).toFixed(2)}</span>
+                            <Badge 
+                              variant="outline" 
+                              className={cn(
+                                "text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5",
+                                order.status === 'PROCESSING' && "border-primary text-primary",
+                                order.status === 'SHIPPED' && "border-blue-500 text-blue-500",
+                                order.status === 'DELIVERED' && "border-green-500 text-green-500",
+                                order.status === 'COMPLETED' && "border-green-500 text-green-500",
+                                order.status === 'PENDING' && "border-yellow-500 text-yellow-500",
+                                order.status === 'CANCELLED' && "border-red-500 text-red-500",
+                                order.status === 'REJECTED' && "border-red-500 text-red-500"
+                              )}
+                            >
+                              {order.status.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic p-3 rounded-lg bg-muted/5 border border-dashed border-border text-center">No orders placed yet.</p>
+                  )}
+                </div>
+
                 <div className="flex justify-end pt-4 border-t border-border">
                   <Button variant="outline" onClick={() => setIsDetailsOpen(false)} className="border-2 font-bold">
                     Close
@@ -276,4 +320,8 @@ export default function AdminCustomersPage() {
       </Dialog>
     </div>
   );
+}
+
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(" ");
 }

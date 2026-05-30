@@ -47,9 +47,11 @@ const statusColor = (status: string) => {
   switch (status) {
     case "PROCESSING": return "border-primary text-primary";
     case "SHIPPED": return "border-blue-500 text-blue-500";
-    case "DELIVERED": return "border-green-500 text-green-500";
+    case "DELIVERED":
+    case "COMPLETED": return "border-green-500 text-green-500";
     case "PENDING": return "border-yellow-500 text-yellow-500";
-    case "CANCELLED": return "border-red-500 text-red-500";
+    case "CANCELLED":
+    case "REJECTED": return "border-red-500 text-red-500";
     default: return "border-muted text-muted-foreground";
   }
 };
@@ -59,6 +61,7 @@ export default function ProfilePage() {
 
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [viewAllOrders, setViewAllOrders] = useState(false);
 
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loadingAddresses, setLoadingAddresses] = useState(true);
@@ -87,7 +90,8 @@ export default function ProfilePage() {
     const fetchOrders = async () => {
       try {
         setLoadingOrders(true);
-        const data = await userApi.getOrders();
+        const isAdmin = (session.user as any)?.role === "ADMIN";
+        const data = await userApi.getOrders(viewAllOrders && isAdmin);
         setOrders(data);
       } catch (err) {
         showToast.error("Could not load orders", err);
@@ -110,7 +114,7 @@ export default function ProfilePage() {
 
     fetchOrders();
     fetchAddresses();
-  }, [session]);
+  }, [session, viewAllOrders]);
 
   if (!session) {
     return (
@@ -215,13 +219,23 @@ export default function ProfilePage() {
 
           {/* Order stats mini card */}
           <Card className="p-6 border-border">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Order Summary</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">
+              {viewAllOrders ? "Store Order Summary" : "My Order Summary"}
+            </p>
             <div className="space-y-3 text-sm">
-              {["PENDING","PROCESSING","SHIPPED","DELIVERED"].map(status => {
+              {["PENDING", "COMPLETED", "REJECTED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(status => {
                 const count = orders.filter(o => o.status === status).length;
+                if (count === 0 && ["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].includes(status)) return null;
+
+                const label = status === "COMPLETED"
+                  ? "Complete"
+                  : status === "REJECTED"
+                  ? "Rejected"
+                  : status.charAt(0) + status.slice(1).toLowerCase();
+
                 return (
                   <div key={status} className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{status.charAt(0) + status.slice(1).toLowerCase()}</span>
+                    <span className="text-muted-foreground">{label}</span>
                     <Badge variant="outline" className={cn("text-[10px] font-black", statusColor(status))}>
                       {count}
                     </Badge>
@@ -243,18 +257,38 @@ export default function ProfilePage() {
 
             {/* Orders Tab */}
             <TabsContent value="orders" className="space-y-6 outline-none">
+              {(session.user as any)?.role === "ADMIN" && (
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-muted/20 p-4 rounded-xl border border-border gap-4">
+                  <div>
+                    <h3 className="font-bold text-sm">Store Administration</h3>
+                    <p className="text-xs text-muted-foreground">Monitor all customer transactions and order fulfillment statuses.</p>
+                  </div>
+                  <Button 
+                    onClick={() => setViewAllOrders(!viewAllOrders)} 
+                    variant={viewAllOrders ? "default" : "outline"} 
+                    className="font-bold text-xs h-9 px-4 shrink-0"
+                  >
+                    {viewAllOrders ? "Viewing All Store Orders" : "Viewing My Personal Orders"}
+                  </Button>
+                </div>
+              )}
+
               {loadingOrders ? (
                 <div className="py-20 flex items-center justify-center gap-3 text-muted-foreground">
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  <span className="font-bold">Loading your orders...</span>
+                  <span className="font-bold">Loading orders...</span>
                 </div>
               ) : orders.length === 0 ? (
                 <div className="py-20 text-center space-y-4">
                   <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto" />
-                  <p className="text-muted-foreground">You haven't placed any orders yet.</p>
-                  <Button asChild variant="link" className="text-primary font-bold">
-                    <Link href="/shop">Start Shopping</Link>
-                  </Button>
+                  <p className="text-muted-foreground">
+                    {viewAllOrders ? "No store orders found in the database." : "You haven't placed any orders yet."}
+                  </p>
+                  {!viewAllOrders && (
+                    <Button asChild variant="link" className="text-primary font-bold">
+                      <Link href="/shop">Start Shopping</Link>
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <AnimatePresence>
@@ -279,6 +313,11 @@ export default function ProfilePage() {
                             </div>
                             <p className="text-xs text-muted-foreground">
                               {formatDate(order.createdAt)} &bull; {order.items?.length} item(s)
+                              {viewAllOrders && order.user && (
+                                <span className="text-primary font-bold ml-1.5">
+                                  &bull; Placed by: {order.user.name || "Anonymous"} ({order.user.email})
+                                </span>
+                              )}
                             </p>
                             {order.items?.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-1">

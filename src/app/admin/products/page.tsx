@@ -56,6 +56,46 @@ export default function AdminProductsPage() {
   const [sizes, setSizes] = useState<string[]>(["S", "M", "L", "XL"]);
   const [colors, setColors] = useState<string[]>(["Black", "White", "Orange"]);
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadingCount, setUploadingCount] = useState(0);
+
+  const handleImageUploads = async (files: FileList | File[]) => {
+    if (!files || files.length === 0) return;
+    setUploadingCount(prev => prev + files.length);
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const data = await adminApi.uploadProductImage(formData);
+        setImages((prev) => [...prev, data.url]);
+      } catch (err) {
+        showToast.error(`Image upload error for ${file.name}`, err);
+      } finally {
+        setUploadingCount(prev => Math.max(0, prev - 1));
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      await handleImageUploads(Array.from(files));
+    }
+  };
 
   // Fetch products
   const fetchProducts = async () => {
@@ -316,43 +356,87 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Product Images (Multiple Allowed)</label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                onChange={async (e) => {
-                  const files = e.target.files;
-                  if (!files || files.length === 0) return;
-                  
-                  for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    try {
-                      const data = await adminApi.uploadProductImage(formData);
-                      setImages((prev) => [...prev, data.url]);
-                    } catch (err) {
-                      showToast.error(`Image upload error for ${file.name}`, err);
+            <div className="space-y-3">
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Product Showcase Images</label>
+              
+              {/* Premium Drag and Drop Zone */}
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => document.getElementById("file-input")?.click()}
+                className={cn(
+                  "relative border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-300 overflow-hidden bg-muted/5 group",
+                  isDragging
+                    ? "border-primary bg-primary/5 scale-[1.01]"
+                    : "border-border hover:border-primary/50 hover:bg-muted/15"
+                )}
+              >
+                {/* Visual Glassmorphic glow overlay when dragging */}
+                {isDragging && (
+                  <div className="absolute inset-0 bg-primary/5 backdrop-blur-[2px] pointer-events-none transition-all" />
+                )}
+
+                <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  {uploadingCount > 0 ? (
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                  ) : (
+                    <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
+                  )}
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-sm font-bold text-foreground">
+                    {uploadingCount > 0 ? `Uploading ${uploadingCount} files...` : "Drag & drop product images here"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Or <span className="text-primary font-black underline">browse local files</span> (PNG, JPG up to 10MB)
+                  </p>
+                </div>
+
+                <input
+                  id="file-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={async (e) => {
+                    if (e.target.files) {
+                      await handleImageUploads(e.target.files);
                     }
-                  }
-                }}
-              />
+                  }}
+                />
+              </div>
+
+              {/* Uploading Files Indicator */}
+              {uploadingCount > 0 && (
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 flex items-center gap-3 text-xs text-primary font-bold">
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                  <span>Processing and uploading garments to Neon cloud storage...</span>
+                </div>
+              )}
+
               {/* Previews Grid */}
               {images.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 mt-2">
+                <div className="grid grid-cols-4 gap-3 mt-3">
                   {images.map((imgUrl, idx) => (
-                    <div key={idx} className="relative aspect-square rounded overflow-hidden border border-border group bg-black">
-                      <img src={imgUrl} alt="preview" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
-                        className="absolute inset-0 bg-red-600/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold text-xs transition-opacity"
-                      >
-                        Remove
-                      </button>
+                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-border group bg-black shadow-lg">
+                      <img src={imgUrl} alt="preview" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition-all duration-300">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setImages((prev) => prev.filter((_, i) => i !== idx));
+                          }}
+                          className="bg-destructive hover:bg-destructive/90 text-white font-black text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-md hover:scale-105 transition-transform"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                      <Badge className="absolute top-2 left-2 bg-black/60 border border-border text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 pointer-events-none">
+                        #{idx + 1}
+                      </Badge>
                     </div>
                   ))}
                 </div>

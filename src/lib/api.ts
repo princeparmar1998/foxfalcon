@@ -24,7 +24,7 @@ export const authApi = {
 };
 
 export const userApi = {
-  getOrders: () => api.get("/api/user/orders").then((res) => res.data),
+  getOrders: (all?: boolean) => api.get("/api/user/orders", { params: { ...(all && { all: true }) } }).then((res) => res.data),
   getAddresses: () => api.get("/api/user/addresses").then((res) => res.data),
   updateProfile: (data: any) => api.put("/api/user/profile", data).then((res) => res.data),
   createAddress: (data: any) => api.post("/api/user/addresses", data).then((res) => res.data),
