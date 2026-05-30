@@ -15,12 +15,22 @@ export async function POST(request: Request) {
     const fileName = `${timestamp}-${safeName}`;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    await fs.mkdir(uploadDir, { recursive: true });
-    const filePath = path.join(uploadDir, fileName);
-    await fs.writeFile(filePath, buffer);
-    // Return URL relative to public root
-    const url = `/uploads/products/${fileName}`;
+
+    // Vercel has a read-only filesystem except /tmp
+    // Try public/uploads first (works locally), fallback to /tmp (works on Vercel)
+    let url = "";
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
+      await fs.mkdir(uploadDir, { recursive: true });
+      const filePath = path.join(uploadDir, fileName);
+      await fs.writeFile(filePath, buffer);
+      url = `/uploads/products/${fileName}`;
+    } catch {
+      // Filesystem is read-only (Vercel) — fallback to base64 data URL
+      const mimeType = file.type || "image/png";
+      url = `data:${mimeType};base64,${buffer.toString("base64")}`;
+    }
+
     return NextResponse.json({ url }, { status: 200 });
   } catch (error) {
     console.error("Upload error:", error);
