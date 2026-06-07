@@ -34,10 +34,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
-}
+import { cn } from "@/lib/utils";
 
 const Label = ({ children }: { children: React.ReactNode }) => (
   <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{children}</label>

@@ -42,6 +42,7 @@ export const adminApi = {
     }).then((res) => res.data),
   getProducts: () => api.get("/api/admin/products").then((res) => res.data),
   createProduct: (data: any) => api.post("/api/admin/products", data).then((res) => res.data),
+  updateProduct: (id: string, data: any) => api.patch(`/api/admin/products/${id}`, data).then((res) => res.data),
   deleteProduct: (id: string) => api.delete(`/api/admin/products/${id}`).then((res) => res.data),
   getStats: () => api.get("/api/admin/stats").then((res) => res.data),
   getOrders: () => api.get("/api/admin/orders").then((res) => res.data),

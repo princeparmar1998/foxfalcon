@@ -2,12 +2,12 @@
 
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  ShoppingBag, 
-  Users, 
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  ShoppingBag,
+  Users,
   Package,
   ArrowUpRight,
   Clock,
@@ -15,13 +15,13 @@ import {
   RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
@@ -66,35 +66,35 @@ export default function AdminDashboard() {
 
   const statCards = stats
     ? [
-        {
-          label: "Total Revenue",
-          value: `$${stats.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-          icon: DollarSign,
-          change: `${stats.revenueChange >= 0 ? "+" : ""}${stats.revenueChange}%`,
-          trending: stats.revenueChange >= 0 ? "up" : "down",
-        },
-        {
-          label: "Total Orders",
-          value: stats.totalOrders.toString(),
-          icon: ShoppingBag,
-          change: `${stats.ordersChange >= 0 ? "+" : ""}${stats.ordersChange}%`,
-          trending: stats.ordersChange >= 0 ? "up" : "down",
-        },
-        {
-          label: "Total Customers",
-          value: stats.totalCustomers.toString(),
-          icon: Users,
-          change: `${stats.customersChange >= 0 ? "+" : ""}${stats.customersChange}%`,
-          trending: stats.customersChange >= 0 ? "up" : "down",
-        },
-        {
-          label: "Products in Stock",
-          value: `${stats.totalProducts - stats.outOfStock} / ${stats.totalProducts}`,
-          icon: Package,
-          change: stats.outOfStock > 0 ? `${stats.outOfStock} out of stock` : "All in stock",
-          trending: stats.outOfStock === 0 ? "up" : "down",
-        },
-      ]
+      {
+        label: "Total Revenue",
+        value: `$${stats.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        icon: DollarSign,
+        change: `${stats.revenueChange >= 0 ? "+" : ""}${stats.revenueChange}%`,
+        trending: stats.revenueChange >= 0 ? "up" : "down",
+      },
+      {
+        label: "Total Orders",
+        value: stats.totalOrders.toString(),
+        icon: ShoppingBag,
+        change: `${stats.ordersChange >= 0 ? "+" : ""}${stats.ordersChange}%`,
+        trending: stats.ordersChange >= 0 ? "up" : "down",
+      },
+      {
+        label: "Total Customers",
+        value: stats.totalCustomers.toString(),
+        icon: Users,
+        change: `${stats.customersChange >= 0 ? "+" : ""}${stats.customersChange}%`,
+        trending: stats.customersChange >= 0 ? "up" : "down",
+      },
+      {
+        label: "Products in Stock",
+        value: `${stats.totalProducts - stats.outOfStock} / ${stats.totalProducts}`,
+        icon: Package,
+        change: stats.outOfStock > 0 ? `${stats.outOfStock} out of stock` : "All in stock",
+        trending: stats.outOfStock === 0 ? "up" : "down",
+      },
+    ]
     : [];
 
   const getStatusColor = (status: string) => {
@@ -125,8 +125,8 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-black tracking-tighter">DASHBOARD OVERVIEW</h1>
           <p className="text-muted-foreground">Welcome back, admin. Here's what's happening today.</p>
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="border-2 font-bold gap-2"
           onClick={() => { fetchStats(); fetchOrders(); }}
         >
@@ -138,28 +138,28 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {loadingStats
           ? Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="p-6 border-border animate-pulse">
-                <div className="h-4 bg-muted rounded w-3/4 mb-4" />
-                <div className="h-8 bg-muted rounded w-1/2" />
-              </Card>
-            ))
+            <Card key={i} className="p-6 border-border animate-pulse">
+              <div className="h-4 bg-muted rounded w-3/4 mb-4" />
+              <div className="h-8 bg-muted rounded w-1/2" />
+            </Card>
+          ))
           : statCards.map((stat) => (
-              <Card key={stat.label} className="p-6 bg-card border-border hover:border-primary/50 transition-colors group">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                    <stat.icon className="w-5 h-5" />
-                  </div>
-                  <div className={`flex items-center gap-1 text-xs font-bold ${stat.trending === "up" ? "text-green-500" : "text-red-500"}`}>
-                    {stat.change}
-                    {stat.trending === "up" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  </div>
+            <Card key={stat.label} className="p-6 bg-card border-border hover:border-primary/50 transition-colors group">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <stat.icon className="w-5 h-5" />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
-                  <h3 className="text-2xl font-black tracking-tight">{stat.value}</h3>
+                <div className={`flex items-center gap-1 text-xs font-bold ${stat.trending === "up" ? "text-green-500" : "text-red-500"}`}>
+                  {stat.change}
+                  {stat.trending === "up" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 </div>
-              </Card>
-            ))}
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
+                <h3 className="text-2xl font-black tracking-tight">{stat.value}</h3>
+              </div>
+            </Card>
+          ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -204,8 +204,8 @@ export default function AdminDashboard() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={cn("text-[10px] font-black uppercase tracking-widest", getStatusColor(order.status))}
                       >
                         {order.status}
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Snapshot</p>
               {loadingStats ? (
                 <div className="space-y-2">
-                  {[1,2,3].map(i => <div key={i} className="h-4 bg-muted rounded animate-pulse" />)}
+                  {[1, 2, 3].map(i => <div key={i} className="h-4 bg-muted rounded animate-pulse" />)}
                 </div>
               ) : stats ? (
                 <div className="space-y-3 text-sm">

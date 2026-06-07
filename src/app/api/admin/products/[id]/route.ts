@@ -52,14 +52,18 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { name, description, price, categoryName, inventory, image, sizes, colors, isFeatured } = body;
+    const { name, description, price, categoryName, inventory, image, images, sizes, colors, isFeatured } = body;
 
     const data: any = {};
     if (name) data.name = name;
     if (description) data.description = description;
     if (price !== undefined) data.price = parseFloat(price);
     if (inventory !== undefined) data.inventory = parseInt(inventory) || 0;
-    if (image !== undefined) data.images = image ? [image] : [];
+    if (images !== undefined) {
+      data.images = images;
+    } else if (image !== undefined) {
+      data.images = image ? [image] : [];
+    }
     if (sizes !== undefined) data.sizes = sizes;
     if (colors !== undefined) data.colors = colors;
     if (isFeatured !== undefined) data.isFeatured = !!isFeatured;

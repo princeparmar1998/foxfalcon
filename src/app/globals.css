@@ -16,9 +16,11 @@
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 20 90% 55%; /* Fox Falcon Brand Orange */
+    --primary: 20 90% 55%;
+    /* Fox Falcon Brand Orange */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 10% 45%; /* Sleek Metallic Gray/Silver */
+    --secondary: 210 10% 45%;
+    /* Sleek Metallic Gray/Silver */
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 95%;
     --muted-foreground: 0 0% 40%;
@@ -39,9 +41,11 @@
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 100%;
-    --primary: 20 100% 55%; /* Fox Falcon Brand Orange */
+    --primary: 20 100% 55%;
+    /* Fox Falcon Brand Orange */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 10% 85%; /* Sleek Metallic Silver */
+    --secondary: 210 10% 85%;
+    /* Sleek Metallic Silver */
     --secondary-foreground: 0 0% 0%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 63%;
@@ -61,4 +65,18 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Card Flip and 3D Transform Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }

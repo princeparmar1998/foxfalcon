@@ -41,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 
 export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<any[]>([]);
@@ -134,7 +135,7 @@ export default function AdminCustomersPage() {
                 {filtered.map((customer) => (
                   <TableRow
                     key={customer.id}
-                    className="border-border hover:bg-muted/50 transition-colors"
+                    className="border-border hover:bg-muted/50 transition-colors group"
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -145,18 +146,18 @@ export default function AdminCustomersPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-bold text-sm">{customer.name || "Anonymous"}</p>
+                          <p className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">{customer.name || "Anonymous"}</p>
                           <p className="text-xs text-muted-foreground">{customer.email}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="text-xs text-muted-foreground font-mono">
                       {formatDate(customer.createdAt)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <ShoppingBag className="w-3.5 h-3.5 text-primary" />
-                        <span className="font-bold">{customer._count?.orders ?? 0}</span>
+                        <span className="font-bold text-sm">{customer._count?.orders ?? 0}</span>
                       </div>
                     </TableCell>
                     <TableCell className="font-black text-primary">
@@ -164,12 +165,12 @@ export default function AdminCustomersPage() {
                     </TableCell>
                     <TableCell>
                       {customer._count?.orders > 0 ? (
-                        <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-green-500 text-green-500 flex items-center gap-1 w-fit">
+                        <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-green-500/20 bg-green-500/5 text-green-500 flex items-center gap-1 w-fit px-2 py-0.5">
                           <UserCheck className="w-3 h-3" /> Active
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-muted text-muted-foreground flex items-center gap-1 w-fit">
-                          <UserX className="w-3 h-3" /> No Orders
+                        <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-muted bg-muted/5 text-muted-foreground flex items-center gap-1 w-fit px-2 py-0.5">
+                          <UserX className="w-3.5 h-3.5" /> No Orders
                         </Badge>
                       )}
                     </TableCell>
@@ -231,11 +232,11 @@ export default function AdminCustomersPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-black text-lg">{selectedCustomer.name || "Anonymous"}</h3>
+                    <h3 className="font-black text-lg text-foreground">{selectedCustomer.name || "Anonymous"}</h3>
                     <p className="text-sm text-muted-foreground">{selectedCustomer.email}</p>
-                    <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground">
-                      <Calendar className="w-3 h-3" />
-                      Joined {formatDate(selectedCustomer.createdAt)}
+                    <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground">
+                      <Calendar className="w-3.5 h-3.5 text-primary" />
+                      <span className="font-mono">Joined {formatDate(selectedCustomer.createdAt)}</span>
                     </div>
                   </div>
                 </div>
@@ -244,11 +245,11 @@ export default function AdminCustomersPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Total Orders</p>
-                    <p className="text-3xl font-black text-primary">{selectedCustomer._count?.orders ?? 0}</p>
+                    <p className="text-3xl font-black text-primary font-mono">{selectedCustomer._count?.orders ?? 0}</p>
                   </div>
                   <div className="p-4 rounded-xl bg-muted/30 border border-border text-center">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Total Spent</p>
-                    <p className="text-3xl font-black text-primary">${parseFloat(selectedCustomer.totalSpent || "0").toFixed(2)}</p>
+                    <p className="text-3xl font-black text-primary font-mono">${parseFloat(selectedCustomer.totalSpent || "0").toFixed(2)}</p>
                   </div>
                 </div>
 
@@ -256,14 +257,18 @@ export default function AdminCustomersPage() {
                 {selectedCustomer.addresses?.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Saved Addresses</h4>
-                    {selectedCustomer.addresses.map((addr: any) => (
-                      <div key={addr.id} className="p-3 rounded-lg bg-muted/10 border border-border text-sm text-muted-foreground">
-                        {addr.street}, {addr.city}, {addr.state} {addr.postalCode}, {addr.country}
-                        {addr.isDefault && (
-                          <span className="ml-2 text-[10px] text-primary font-black uppercase">Default</span>
-                        )}
-                      </div>
-                    ))}
+                    <div className="space-y-2">
+                      {selectedCustomer.addresses.map((addr: any) => (
+                        <div key={addr.id} className="p-3 rounded-lg bg-muted/10 border border-border text-sm text-muted-foreground flex justify-between items-center">
+                          <div>
+                            {addr.street}, {addr.city}, {addr.state} {addr.postalCode}, {addr.country}
+                          </div>
+                          {addr.isDefault && (
+                            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5">Default</Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -277,8 +282,8 @@ export default function AdminCustomersPage() {
                       {selectedCustomer.orderHistory.map((order: any) => (
                         <div key={order.id} className="flex justify-between items-center p-3 rounded-lg bg-muted/10 border border-border text-sm">
                           <div>
-                            <span className="font-mono text-xs font-bold text-foreground block">{order.id.slice(0, 16)}...</span>
-                            <span className="text-[10px] text-muted-foreground block mt-0.5">
+                            <span className="font-mono text-xs font-bold text-foreground block">#{order.id.slice(-8).toUpperCase()}</span>
+                            <span className="text-[10px] text-muted-foreground block mt-0.5 font-mono">
                               {new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                             </span>
                           </div>
@@ -288,13 +293,13 @@ export default function AdminCustomersPage() {
                               variant="outline" 
                               className={cn(
                                 "text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5",
-                                order.status === 'PROCESSING' && "border-primary text-primary",
-                                order.status === 'SHIPPED' && "border-blue-500 text-blue-500",
-                                order.status === 'DELIVERED' && "border-green-500 text-green-500",
-                                order.status === 'COMPLETED' && "border-green-500 text-green-500",
-                                order.status === 'PENDING' && "border-yellow-500 text-yellow-500",
-                                order.status === 'CANCELLED' && "border-red-500 text-red-500",
-                                order.status === 'REJECTED' && "border-red-500 text-red-500"
+                                order.status === 'PROCESSING' && "border-primary/20 bg-primary/5 text-primary",
+                                order.status === 'SHIPPED' && "border-blue-500/20 bg-blue-500/5 text-blue-500",
+                                order.status === 'DELIVERED' && "border-green-500/20 bg-green-500/5 text-green-500",
+                                order.status === 'COMPLETED' && "border-green-500/20 bg-green-500/5 text-green-500",
+                                order.status === 'PENDING' && "border-yellow-500/20 bg-yellow-500/5 text-yellow-500",
+                                order.status === 'CANCELLED' && "border-red-500/20 bg-red-500/5 text-red-500",
+                                order.status === 'REJECTED' && "border-red-500/20 bg-red-500/5 text-red-500"
                               )}
                             >
                               {order.status.replace('_', ' ')}
@@ -320,8 +325,4 @@ export default function AdminCustomersPage() {
       </Dialog>
     </div>
   );
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }

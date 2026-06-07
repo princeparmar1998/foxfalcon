@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingBag, 
-  Users, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingBag,
+  Users,
+  BarChart3,
   Settings,
   Menu,
   ChevronRight
@@ -36,7 +36,7 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-background pt-16">
       {/* Admin Sidebar */}
-      <aside 
+      <aside
         className={cn(
           "fixed left-0 top-16 bottom-0 z-30 bg-card border-r border-border transition-all duration-300",
           isSidebarOpen ? "w-64" : "w-20"
@@ -59,8 +59,8 @@ export default function AdminLayout({
                 href={link.href}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg transition-all group relative",
-                  pathname === link.href 
-                    ? "bg-primary text-primary-foreground" 
+                  pathname === link.href
+                    ? "bg-primary text-primary-foreground"
                     : "hover:bg-muted text-muted-foreground hover:text-foreground"
                 )}
               >
@@ -83,7 +83,7 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main 
+      <main
         className={cn(
           "flex-1 transition-all duration-300 p-8",
           isSidebarOpen ? "ml-64" : "ml-20"

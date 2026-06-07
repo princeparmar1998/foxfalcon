@@ -27,6 +27,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { productsApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const cart = useCart();
@@ -156,19 +157,19 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         <div className="space-y-8">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Badge variant="outline" className="text-secondary border-secondary/30 uppercase tracking-widest font-black text-[10px]">
+              <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary uppercase tracking-widest font-black text-[10px] px-2.5 py-1">
                 {product.category?.name || "Premium streetwear"}
               </Badge>
               <div className="flex items-center gap-1 text-sm font-bold">
                 <Star className="w-4 h-4 fill-primary text-primary" />
-                4.8 <span className="text-muted-foreground font-medium">(42 Reviews)</span>
+                <span>4.8</span> <span className="text-muted-foreground font-medium font-mono">(42)</span>
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight uppercase">{product.name}</h1>
-            <p className="text-3xl font-black text-primary">${parseFloat(product.price).toFixed(2)}</p>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-foreground">{product.name}</h1>
+            <p className="text-3xl font-black text-primary font-mono">${parseFloat(product.price).toFixed(2)}</p>
           </div>
 
-          <p className="text-muted-foreground leading-relaxed italic">
+          <p className="text-muted-foreground leading-relaxed text-sm">
             {product.description}
           </p>
 
@@ -178,12 +179,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           {product.sizes && product.sizes.length > 0 && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Select Size</label>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Select Size</label>
                 <button 
                   onClick={() => setSizeGuideOpen(true)}
-                  className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                  className="text-xs font-black uppercase tracking-wider text-primary hover:underline flex items-center gap-1 active-scale"
                 >
-                  <Ruler className="w-3.5 h-3.5" /> Size Guide
+                  <Ruler className="w-4.5 h-4.5" /> Size Guide
                 </button>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -192,10 +193,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={cn(
-                      "w-14 h-14 rounded-xl border-2 flex items-center justify-center font-bold transition-all",
+                      "w-12 h-12 rounded-xl border-2 flex items-center justify-center font-black text-xs transition-all active-scale",
                       selectedSize === size 
-                        ? "border-primary bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/20" 
-                        : "border-border hover:border-primary/50"
+                        ? "border-primary bg-primary text-primary-foreground scale-105 shadow-lg shadow-primary/20" 
+                        : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
                     )}
                   >
                     {size}
@@ -207,17 +208,17 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
           {/* Quantity & Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex items-center border-2 border-border rounded-xl h-14 bg-muted/30">
+            <div className="flex items-center border border-border rounded-xl h-14 bg-muted/20">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-4 hover:text-primary transition-colors"
+                className="px-4 hover:text-primary transition-colors active-scale"
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="w-8 text-center font-bold">{quantity}</span>
+              <span className="w-8 text-center font-bold font-mono">{quantity}</span>
               <button 
                 onClick={() => setQuantity(quantity + 1)}
-                className="px-4 hover:text-primary transition-colors"
+                className="px-4 hover:text-primary transition-colors active-scale"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -225,10 +226,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             <Button 
               onClick={handleAddToCart}
               className={cn(
-                "flex-1 h-14 text-lg font-black group transition-all duration-300",
+                "flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale",
                 isAddedToCart 
                   ? "bg-red-600 hover:bg-red-700 text-white" 
-                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  : "bg-primary hover:bg-primary/95 text-primary-foreground"
               )}
             >
               <ShoppingBag className="w-5 h-5 mr-2 group-hover:animate-bounce" /> 
@@ -244,35 +245,35 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 image: images[0]
               })}
               className={cn(
-                "h-14 w-14 rounded-xl border-2 transition-colors",
-                wishlist.isInWishlist(product.id) ? "border-red-500 text-red-500 bg-red-500/10 hover:bg-red-500/20" : ""
+                "h-14 w-14 rounded-xl border-2 transition-colors active-scale",
+                wishlist.isInWishlist(product.id) ? "border-red-500 text-red-500 bg-red-500/10 hover:bg-red-500/20" : "border-border"
               )}
             >
-              <Heart className={cn("w-6 h-6", wishlist.isInWishlist(product.id) ? "fill-red-500 text-red-500" : "")} />
+              <Heart className={cn("w-5 h-5", wishlist.isInWishlist(product.id) ? "fill-red-500 text-red-500" : "")} />
             </Button>
           </div>
 
           {/* Shipping Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-border">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-border/80">
             <div className="flex items-center gap-3">
-              <Truck className="w-5 h-5 text-secondary" />
+              <Truck className="w-5 h-5 text-primary" />
               <div className="space-y-0.5">
-                <p className="text-xs font-bold">Free Shipping</p>
-                <p className="text-[10px] text-muted-foreground">On orders over $99</p>
+                <p className="text-xs font-black uppercase tracking-wider text-foreground">Free Shipping</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold">On orders over $99</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <RefreshCcw className="w-5 h-5 text-secondary" />
+              <RefreshCcw className="w-5 h-5 text-primary" />
               <div className="space-y-0.5">
-                <p className="text-xs font-bold">30 Days Return</p>
-                <p className="text-[10px] text-muted-foreground">No questions asked</p>
+                <p className="text-xs font-black uppercase tracking-wider text-foreground">30 Days Return</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold">No questions asked</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 text-secondary" />
+              <ShieldCheck className="w-5 h-5 text-primary" />
               <div className="space-y-0.5">
-                <p className="text-xs font-bold">Secure Payment</p>
-                <p className="text-[10px] text-muted-foreground">100% Secure Checkout</p>
+                <p className="text-xs font-black uppercase tracking-wider text-foreground">Secure Payment</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold font-mono">100% SECURE</p>
               </div>
             </div>
           </div>
@@ -283,15 +284,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       <div className="mt-20">
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-8">
-            <TabsTrigger value="details" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-bold text-base bg-transparent border-none">Details</TabsTrigger>
-            <TabsTrigger value="material" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-bold text-base bg-transparent border-none">Material & Care</TabsTrigger>
-            <TabsTrigger value="reviews" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-bold text-base bg-transparent border-none">Reviews (42)</TabsTrigger>
+            <TabsTrigger value="details" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Details</TabsTrigger>
+            <TabsTrigger value="material" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Material & Care</TabsTrigger>
+            <TabsTrigger value="reviews" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Reviews (42)</TabsTrigger>
           </TabsList>
-          <TabsContent value="details" className="pt-8 text-muted-foreground leading-relaxed">
+          <TabsContent value="details" className="pt-8 text-muted-foreground leading-relaxed text-sm">
             Designed for the ultimate streetwear enthusiast, the {product.name} offers a premium silhouette that's both comfortable and cutting-edge. The premium composition and extra room in the body create a relaxed look without compromising on quality.
           </TabsContent>
-          <TabsContent value="material" className="pt-8 text-muted-foreground leading-relaxed">
-            <ul className="list-disc list-inside space-y-2">
+          <TabsContent value="material" className="pt-8 text-muted-foreground leading-relaxed text-sm">
+            <ul className="list-disc list-inside space-y-2 uppercase text-[10px] tracking-wider font-bold">
               <li>100% Combed Cotton</li>
               <li>240 GSM Heavyweight Premium Fabric</li>
               <li>Bio-washed and Pre-shrunk</li>
@@ -299,7 +300,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </ul>
           </TabsContent>
           <TabsContent value="reviews" className="pt-8">
-            <p className="text-muted-foreground">Premium customer reviews will appear here soon.</p>
+            <p className="text-muted-foreground text-sm uppercase tracking-wider font-bold">Premium customer reviews will appear here soon.</p>
           </TabsContent>
         </Tabs>
       </div>
@@ -350,9 +351,4 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       </Dialog>
     </div>
   );
-}
-
-// Helper function for class merging
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(" ");
 }

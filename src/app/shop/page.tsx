@@ -94,55 +94,37 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="container px-6 mx-auto pt-32 pb-20">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-        <div className="space-y-2">
-          <h1 className="text-5xl font-black tracking-tighter">THE SHOP</h1>
-          <p className="text-muted-foreground">
-            {loading ? "Loading products..." : `${filteredProducts.length} premium items available`}
+    <div className="container px-6 mx-auto pt-32 pb-20 bg-background text-foreground">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+        <div className="space-y-1">
+          <h1 className="text-5xl font-black tracking-tighter uppercase">THE SHOP</h1>
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
+            {loading ? "Loading catalog..." : `${filteredProducts.length} items catalogued in database`}
           </p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+        <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative flex-grow md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input 
-              placeholder="Search products..." 
-              className="pl-10 h-11 bg-muted/50 border-border"
+              placeholder="Search catalog..." 
+              className="pl-10 h-11 bg-muted/30 border-border focus-visible:ring-primary/40 rounded-xl"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-11 font-bold border-2 gap-2">
-                <Filter className="w-4 h-4" /> {selectedCategory} <ChevronDown className="w-4 h-4" />
+              <Button variant="outline" className="h-11 font-black uppercase tracking-wider text-xs border-2 gap-2 rounded-xl active-scale">
+                Sort: {SORT_OPTIONS.find(s => s.value === sortBy)?.label} <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 max-h-60 overflow-y-auto">
-              {dynamicCategories.map((cat: any) => (
-                <DropdownMenuItem 
-                  key={cat} 
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`font-medium capitalize ${selectedCategory.toLowerCase() === cat.toLowerCase() ? "text-primary font-bold" : ""}`}
-                >
-                  {cat}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-11 font-bold border-2 gap-2">
-                {SORT_OPTIONS.find(s => s.value === sortBy)?.label} <ChevronDown className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuContent align="end" className="w-52 bg-card border-border">
               {SORT_OPTIONS.map((opt) => (
                 <DropdownMenuItem 
                   key={opt.value}
                   onClick={() => setSortBy(opt.value)}
-                  className={`font-medium ${sortBy === opt.value ? "text-primary font-bold" : ""}`}
+                  className={`font-bold uppercase tracking-wider text-xs cursor-pointer ${sortBy === opt.value ? "text-primary font-black" : ""}`}
                 >
                   {opt.label}
                 </DropdownMenuItem>
@@ -150,6 +132,27 @@ export default function ShopPage() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
+
+      {/* Category Horizontal Pill Strip */}
+      <div className="flex overflow-x-auto pb-4 gap-2 mb-10 border-b border-border/40 scrollbar-none">
+        {dynamicCategories.map((cat: any) => {
+          const isActive = selectedCategory.toLowerCase() === cat.toLowerCase();
+          return (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={cn(
+                "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap active-scale",
+                isActive 
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                  : "bg-muted/30 border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+              )}
+            >
+              {cat}
+            </button>
+          );
+        })}
       </div>
 
       {/* Products Grid */}
