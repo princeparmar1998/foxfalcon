@@ -51,8 +51,8 @@ export default function WishlistPage() {
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="group relative overflow-hidden bg-card border-border hover:border-primary/20 transition-all duration-300 rounded-2xl">
-                <div className="relative aspect-[4/5] overflow-hidden bg-black border-b border-border/40">
+              <Card className="group relative overflow-hidden bg-card/30 backdrop-blur-md border border-border/50 hover:border-primary/30 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-lg shadow-black/20 ring-0">
+                <div className="relative aspect-[4/5] overflow-hidden bg-black/40 border border-border/40 rounded-xl">
                   <Image 
                     src={item.image} 
                     alt={item.name}
@@ -71,9 +71,9 @@ export default function WishlistPage() {
                   </div>
                 </div>
                 
-                <div className="p-5 space-y-4">
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors truncate">
+                <div className="mt-3 px-1 space-y-3">
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs md:text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors truncate">
                       {item.name}
                     </h3>
                     <p className="text-xs font-mono font-black text-primary">${item.price.toFixed(2)}</p>
@@ -82,12 +82,12 @@ export default function WishlistPage() {
                   <div className="flex gap-2">
                     <Button 
                       onClick={() => handleMoveToCart(item)}
-                      className="flex-1 h-10 text-xs font-black uppercase tracking-wider bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl active-scale"
+                      className="flex-1 h-9 text-[10px] font-black uppercase tracking-wider bg-primary hover:bg-primary/95 text-primary-foreground rounded-lg active-scale"
                     >
-                      <ShoppingBag className="w-4 h-4 mr-1.5" /> Add to Cart
+                      <ShoppingBag className="w-3.5 h-3.5 mr-1" /> Add to Cart
                     </Button>
-                    <Button asChild variant="outline" size="icon" className="h-10 w-10 border-2 rounded-xl active-scale">
-                      <Link href={`/shop/${item.id}`}><ArrowRight className="w-4 h-4" /></Link>
+                    <Button asChild variant="outline" size="icon" className="h-9 w-9 border-2 rounded-lg active-scale">
+                      <Link href={`/shop/${item.id}`}><ArrowRight className="w-3.5 h-3.5" /></Link>
                     </Button>
                   </div>
                 </div>

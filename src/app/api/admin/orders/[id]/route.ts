@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
 import { pusherServer } from "@/lib/pusher";
+import { sendUserOrderStatusEmail } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,13 @@ export async function PATCH(
         status: status,
       });
     }
+
+    // Send order confirmation/processing email to the user
+    // if (status === "PROCESSING") {
+    //   sendUserOrderStatusEmail(order.id, "PROCESSING").catch((err) => {
+    //     console.error("[USER_MAIL_ERROR] Failed to send order processing email:", err);
+    //   });
+    // }
 
     return NextResponse.json(order);
   } catch (error) {

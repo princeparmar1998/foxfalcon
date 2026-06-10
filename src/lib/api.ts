@@ -25,6 +25,7 @@ export const authApi = {
 
 export const userApi = {
   getOrders: (all?: boolean) => api.get("/api/user/orders", { params: { ...(all && { all: true }) } }).then((res) => res.data),
+  getOrderById: (id: string) => api.get(`/api/orders/${id}`).then((res) => res.data),
   getAddresses: () => api.get("/api/user/addresses").then((res) => res.data),
   updateProfile: (data: any) => api.put("/api/user/profile", data).then((res) => res.data),
   createAddress: (data: any) => api.post("/api/user/addresses", data).then((res) => res.data),
@@ -33,6 +34,13 @@ export const userApi = {
 
 export const checkoutApi = {
   createSession: (data: any) => api.post("/api/checkout", data).then((res) => res.data),
+};
+
+export const reviewsApi = {
+  getByProductId: (productId: string) => api.get(`/api/products/${productId}/reviews`).then((res) => res.data),
+  create: (productId: string, data: { rating: number; comment: string }) => api.post(`/api/products/${productId}/reviews`, data).then((res) => res.data),
+  update: (productId: string, data: { rating: number; comment: string }) => api.put(`/api/products/${productId}/reviews`, data).then((res) => res.data),
+  delete: (productId: string) => api.delete(`/api/products/${productId}/reviews`).then((res) => res.data),
 };
 
 export const adminApi = {
@@ -49,4 +57,6 @@ export const adminApi = {
   updateOrderStatus: (id: string, status: string) =>
     api.patch(`/api/admin/orders/${id}`, { status }).then((res) => res.data),
   getCustomers: () => api.get("/api/admin/customers").then((res) => res.data),
+  getReviews: () => api.get("/api/admin/reviews").then((res) => res.data),
+  deleteReview: (id: string) => api.delete(`/api/admin/reviews?id=${id}`).then((res) => res.data),
 };

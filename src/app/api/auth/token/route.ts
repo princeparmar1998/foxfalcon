@@ -5,6 +5,18 @@ import { encode } from "next-auth/jwt";
 
 export const dynamic = "force-dynamic";
 
+// Handle CORS preflight requests from browsers (Expo web view, etc.)
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 /**
  * POST endpoint to authenticate credentials and generate a secure JWT token.
  * Enables API-driven integrations, headless applications, and mobile apps to interact

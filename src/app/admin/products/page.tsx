@@ -563,7 +563,19 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
             <form onSubmit={handleSubmit} className="space-y-6 pt-2">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Product Name *</label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Product Name *</label>
+                    <div className="relative group inline-block">
+                      <HelpCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-popover border border-border text-popover-foreground text-[10px] font-medium p-3 rounded-lg shadow-2xl w-64 text-left normal-case leading-relaxed z-50">
+                        <div className="font-bold text-primary mb-1 uppercase tracking-wider">💡 Marketing Copy Tips</div>
+                        <ul className="space-y-1 text-muted-foreground">
+                          <li>• <strong>Standard</strong> ki jagah <strong>"Most Popular"</strong> ka use karein.</li>
+                          <li>• <strong>Cheap</strong> ki jagah <strong>"Value for Money"</strong> likhein.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                   <Input
                     placeholder="e.g. Vintage Oversized Hoodie"
                     value={name}
@@ -573,7 +585,19 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Price ($) *</label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Price ($) *</label>
+                    <div className="relative group inline-block">
+                      <HelpCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-popover border border-border text-popover-foreground text-[10px] font-medium p-3 rounded-lg shadow-2xl w-64 text-left normal-case leading-relaxed z-50">
+                        <div className="font-bold text-primary mb-1 uppercase tracking-wider">💡 Price Optimization</div>
+                        <ul className="space-y-1 text-muted-foreground">
+                          <li>• <strong>$100</strong> ki jagah <strong>$99</strong> ya <strong>$99.99</strong> likhein (Psychological Pricing).</li>
+                          <li>• <strong>Discount</strong> word ki jagah <strong>"Special Offer"</strong> bolein.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                   <Input
                     type="number"
                     step="0.01"
@@ -602,7 +626,19 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Stock Count</label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Stock Count</label>
+                    <div className="relative group inline-block">
+                      <HelpCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-popover border border-border text-popover-foreground text-[10px] font-medium p-3 rounded-lg shadow-2xl w-64 text-left normal-case leading-relaxed z-50">
+                        <div className="font-bold text-primary mb-1 uppercase tracking-wider">💡 Urgency & Scarcity</div>
+                        <ul className="space-y-1 text-muted-foreground">
+                          <li>• Generic <strong>"Few"</strong> ke bajaye <strong>"Limited"</strong> bolein.</li>
+                          <li>• Buy Now button ko push karne ke liye stock limits/messages me <strong>"Only 5 Left"</strong> jaise labels apply karein.</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                   <Input
                     type="number"
                     placeholder="e.g. 50"
@@ -716,8 +752,8 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                           }
                         }}
                         className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center font-bold text-xs transition-all ${isSelected
-                            ? "border-primary bg-primary text-primary-foreground scale-105"
-                            : "border-border text-muted-foreground hover:border-primary/50"
+                          ? "border-primary bg-primary text-primary-foreground scale-105"
+                          : "border-border text-muted-foreground hover:border-primary/50"
                           }`}
                       >
                         {size}
@@ -728,7 +764,18 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Description *</label>
+                <div className="flex items-center gap-1.5">
+                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Description *</label>
+                  <div className="relative group inline-block">
+                    <HelpCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-popover border border-border text-popover-foreground text-[10px] font-medium p-3 rounded-lg shadow-2xl w-64 text-left normal-case leading-relaxed z-50">
+                      <div className="font-bold text-primary mb-1 uppercase tracking-wider">💡 Feature vs Benefit Copy</div>
+                      <p className="text-muted-foreground leading-relaxed">
+                        Product ke features warning ya specs ki jagah humesha unse hone wale <strong>Benefits</strong> ko details me samjhayein, taaki customer relate kar sake.
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <textarea
                   className="w-full min-h-[100px] rounded-lg border border-input bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none text-foreground border-border bg-black"
                   placeholder="Write premium marketing copy for this streetwear garment..."

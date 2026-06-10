@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionOrJwt } from "@/lib/jwt-auth";
 import { db } from "@/lib/db";
+import { sendOrderNotificationEmail } from "@/lib/mail";
 
 export async function POST(req: Request) {
   try {
@@ -60,6 +61,11 @@ export async function POST(req: Request) {
         },
       },
     });
+
+    // Send order notification email to admin (non-blocking)
+    // sendOrderNotificationEmail(order.id).catch((err) => {
+    //   console.error("[CHECKOUT_MAIL_ERROR]", err);
+    // });
 
     return NextResponse.json({ success: true, orderId: order.id });
   } catch (error) {

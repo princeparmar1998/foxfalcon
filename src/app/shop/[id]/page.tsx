@@ -21,11 +21,13 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
-import { productsApi } from "@/lib/api";
+import { productsApi, reviewsApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +40,73 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+
+  const { data: session } = useSession();
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  const [ratingInput, setRatingInput] = useState(5);
+  const [commentInput, setCommentInput] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+
+  const fetchReviews = async () => {
+    try {
+      setLoadingReviews(true);
+      const data = await reviewsApi.getByProductId(params.id);
+      setReviews(data);
+    } catch (err) {
+      console.error("Could not fetch reviews:", err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (ratingInput < 1 || ratingInput > 5 || !commentInput.trim()) {
+      showToast.error("Please provide a valid rating and comment.");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      if (editingReviewId) {
+        await reviewsApi.update(product.id, { rating: ratingInput, comment: commentInput });
+        showToast.success("Review updated successfully!");
+      } else {
+        await reviewsApi.create(product.id, { rating: ratingInput, comment: commentInput });
+        showToast.success("Review submitted successfully!");
+      }
+      setCommentInput("");
+      setRatingInput(5);
+      setEditingReviewId(null);
+      setIsReviewFormOpen(false);
+      fetchReviews();
+    } catch (err: any) {
+      console.error(err);
+      showToast.error("Failed to submit review", err?.response?.data || err);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleReviewDelete = async () => {
+    if (!confirm("Are you sure you want to delete your review?")) return;
+
+    try {
+      setSubmittingReview(true);
+      await reviewsApi.delete(product.id);
+      showToast.success("Review deleted successfully!");
+      fetchReviews();
+    } catch (err) {
+      console.error(err);
+      showToast.error("Could not delete review", err);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchProduct() {
@@ -55,6 +124,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       }
     }
     fetchProduct();
+    fetchReviews();
   }, [params.id]);
 
   const isAddedToCart = cart.items.some(
@@ -162,7 +232,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </Badge>
               <div className="flex items-center gap-1 text-sm font-bold">
                 <Star className="w-4 h-4 fill-primary text-primary" />
-                <span>4.8</span> <span className="text-muted-foreground font-medium font-mono">(42)</span>
+                <span>
+                  {reviews.length > 0 
+                    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+                    : "0.0"}
+                </span> 
+                <span className="text-muted-foreground font-medium font-mono">({reviews.length})</span>
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-foreground">{product.name}</h1>
@@ -286,7 +361,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-8">
             <TabsTrigger value="details" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Details</TabsTrigger>
             <TabsTrigger value="material" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Material & Care</TabsTrigger>
-            <TabsTrigger value="reviews" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Reviews (42)</TabsTrigger>
+            <TabsTrigger value="reviews" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-3 text-xs font-black uppercase tracking-widest bg-transparent border-none">Reviews ({reviews.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="pt-8 text-muted-foreground leading-relaxed text-sm">
             Designed for the ultimate streetwear enthusiast, the {product.name} offers a premium silhouette that's both comfortable and cutting-edge. The premium composition and extra room in the body create a relaxed look without compromising on quality.
@@ -300,7 +375,149 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </ul>
           </TabsContent>
           <TabsContent value="reviews" className="pt-8">
-            <p className="text-muted-foreground text-sm uppercase tracking-wider font-bold">Premium customer reviews will appear here soon.</p>
+            <div className="flex flex-col lg:flex-row gap-12">
+              {/* Rating Stats Summary */}
+              <div className="lg:w-80 space-y-6 shrink-0">
+                <Card className="p-6 border-border bg-card/30 backdrop-blur-md">
+                  <div className="text-center space-y-2">
+                    <span className="text-5xl font-black text-primary font-mono">
+                      {reviews.length > 0 
+                        ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+                        : "0.0"}
+                    </span>
+                    <div className="flex justify-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const avg = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) : 0;
+                        return (
+                          <Star 
+                            key={star} 
+                            className={cn(
+                              "w-5 h-5",
+                              star <= Math.round(avg) ? "fill-primary text-primary" : "text-muted-foreground"
+                            )} 
+                          />
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">
+                      Based on {reviews.length} customer {reviews.length === 1 ? "review" : "reviews"}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 space-y-2">
+                    {[5, 4, 3, 2, 1].map((stars) => {
+                      const count = reviews.filter((r) => r.rating === stars).length;
+                      const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                      return (
+                        <div key={stars} className="flex items-center gap-3 text-xs">
+                          <span className="w-3 font-bold font-mono">{stars}</span>
+                          <Star className="w-3.5 h-3.5 text-primary fill-primary shrink-0" />
+                          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary" style={{ width: `${percentage}%` }} />
+                          </div>
+                          <span className="w-8 text-right font-mono text-muted-foreground">{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Card>
+
+                {session ? (
+                  !reviews.some((r) => r.userId === session.user?.id) ? (
+                    <Button 
+                      onClick={() => {
+                        setEditingReviewId(null);
+                        setRatingInput(5);
+                        setCommentInput("");
+                        setIsReviewFormOpen(true);
+                      }} 
+                      className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold h-12 uppercase tracking-wider text-xs rounded-xl"
+                    >
+                      Write a Review
+                    </Button>
+                  ) : (
+                    <Card className="p-4 border-border bg-muted/10 flex flex-col gap-3">
+                      <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider text-center">You have reviewed this garment</p>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            const userReview = reviews.find((r) => r.userId === session.user?.id);
+                            if (userReview) {
+                              setEditingReviewId(userReview.id);
+                              setRatingInput(userReview.rating);
+                              setCommentInput(userReview.comment);
+                              setIsReviewFormOpen(true);
+                            }
+                          }} 
+                          className="flex-1 border-2 font-bold h-10 text-[10px] uppercase tracking-wider"
+                        >
+                          Edit
+                        </Button>
+                        <Button 
+                          variant="ghost"
+                          onClick={handleReviewDelete}
+                          className="flex-1 bg-destructive/10 text-destructive hover:bg-destructive/25 font-bold h-10 text-[10px] uppercase tracking-wider"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </Card>
+                  )
+                ) : (
+                  <Card className="p-4 border-border bg-muted/20 text-center space-y-2">
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Want to share your feedback?</p>
+                    <Button asChild variant="outline" className="w-full border-2 font-bold text-xs uppercase h-10">
+                      <Link href="/login">Login to Write Review</Link>
+                    </Button>
+                  </Card>
+                )}
+              </div>
+
+              {/* Reviews List */}
+              <div className="flex-grow space-y-6">
+                {reviews.length === 0 ? (
+                  <div className="py-12 text-center bg-muted/10 rounded-3xl border border-border/50">
+                    <p className="text-muted-foreground text-sm uppercase tracking-wider font-bold">No reviews yet.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Be the first to share your streetwear feedback!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map((review) => (
+                      <Card key={review.id} className="p-6 border-border bg-card/10 hover:border-primary/20 transition-all relative group">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-black text-sm uppercase tracking-tight">{review.user?.name || "Customer"}</span>
+                              {review.userId === session?.user?.id && (
+                                <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5">My Review</Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star 
+                                  key={star} 
+                                  className={cn(
+                                    "w-3.5 h-3.5",
+                                    star <= review.rating ? "fill-primary text-primary" : "text-muted-foreground"
+                                  )} 
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground font-semibold font-mono">
+                            {new Date(review.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                          {review.comment}
+                        </p>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -347,6 +564,69 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               * Measurements are approximate. Our garments are pre-shrunk for the optimal oversized boxy fit.
             </p>
           </div>
+         </DialogContent>
+      </Dialog>
+
+      {/* Review Dialog */}
+      <Dialog open={isReviewFormOpen} onOpenChange={setIsReviewFormOpen}>
+        <DialogContent className="sm:max-w-[450px] bg-background border-border text-foreground">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black uppercase tracking-tighter">
+              {editingReviewId ? "EDIT YOUR REVIEW" : "WRITE A REVIEW"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingReviewId 
+                ? "Update your ratings and thoughts for this streetwear garment." 
+                : "Share your experience with this garment to help other shoppers."}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleReviewSubmit} className="space-y-6 pt-4">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Garment Rating *</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRatingInput(star)}
+                    className="transition-transform active-scale hover:scale-110"
+                  >
+                    <Star 
+                      className={cn(
+                        "w-8 h-8",
+                        star <= ratingInput ? "fill-primary text-primary" : "text-muted-foreground/40"
+                      )} 
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Your Thoughts *</label>
+              <textarea
+                className="w-full min-h-[120px] rounded-xl border border-border bg-muted/20 px-3 py-2 text-sm focus-visible:outline-none text-foreground bg-black"
+                placeholder="Write your review here... Is the sizing accurate? How is the fabric quality?"
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsReviewFormOpen(false)} 
+                className="border-2 font-bold"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={submittingReview} className="bg-primary hover:bg-primary/95 text-primary-foreground font-bold px-6">
+                {submittingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit Review"}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

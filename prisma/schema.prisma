@@ -38,6 +38,7 @@ model User {
   wishlist      Wishlist?
   addresses     Address[]
   customDesigns CustomDesign[]
+  reviews       Review[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -91,6 +92,7 @@ model Product {
   isFeatured  Boolean  @default(false)
   orderItems  OrderItem[]
   wishlists   Wishlist[]
+  reviews     Review[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -158,4 +160,18 @@ model CustomDesign {
   imageUrl    String
   designData  Json?    // For canvas state or detailed design info
   createdAt   DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // 1 to 5 stars
+  comment   String   @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId]) // Limit to one review per product per user
 }

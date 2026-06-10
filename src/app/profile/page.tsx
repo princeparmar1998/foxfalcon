@@ -15,8 +15,13 @@ import {
   Loader2,
   CheckCircle2,
   Star,
-  Save
+  Save,
+  Clock,
+  Truck,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
+import { useOrderTracking } from "@/hooks/use-order-tracking";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -53,12 +58,35 @@ const statusColor = (status: string) => {
   }
 };
 
+const statusSteps = [
+  { id: "PENDING", label: "Placed", icon: Clock },
+  { id: "PROCESSING", label: "Processing", icon: Package },
+  { id: "SHIPPED", label: "Shipped", icon: Truck },
+  { id: "DELIVERED", label: "Delivered", icon: CheckCircle2 },
+];
+
 export default function ProfilePage() {
   const { data: session, update: updateSession } = useSession();
 
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [viewAllOrders, setViewAllOrders] = useState(false);
+
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  // Hook for live status updates of the expanded order
+  const { status: liveStatus } = useOrderTracking(expandedOrderId || "");
+
+  useEffect(() => {
+    if (liveStatus && expandedOrderId) {
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === expandedOrderId ? { ...order, status: liveStatus } : order
+        )
+      );
+      showToast.success(`Order status updated to: ${liveStatus}`);
+    }
+  }, [liveStatus, expandedOrderId]);
 
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loadingAddresses, setLoadingAddresses] = useState(true);
@@ -333,11 +361,157 @@ export default function ProfilePage() {
                             <span className="text-xl font-black text-primary">
                               ${parseFloat(order.totalAmount).toFixed(2)}
                             </span>
-                            <Button asChild variant="outline" size="sm" className="border-2 font-bold">
-                              <Link href="/track-order">Track <ChevronRight className="w-4 h-4 ml-1" /></Link>
+                            <Button 
+                              onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+                              variant="outline" 
+                              size="sm" 
+                              className="border-2 font-bold flex items-center gap-1.5"
+                            >
+                              <span>Track Order</span>
+                              {expandedOrderId === order.id ? (
+                                <ChevronUp className="w-4 h-4 text-primary" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
                             </Button>
                           </div>
                         </div>
+
+                        {/* Expanded inline tracking panel */}
+                        <AnimatePresence>
+                          {expandedOrderId === order.id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-6 mt-6 border-t border-border space-y-6">
+                                {/* Status banner if cancelled/rejected */}
+                                {(order.status === "CANCELLED" || order.status === "REJECTED") ? (
+                                  <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-sm">
+                                    <p className="font-bold uppercase tracking-wider text-xs">Order {order.status === "CANCELLED" ? "Cancelled" : "Rejected"}</p>
+                                    <p className="text-red-400 mt-1">This order was {order.status === "CANCELLED" ? "cancelled" : "rejected by store administrators"}. Please contact support for more details.</p>
+                                  </div>
+                                ) : (
+                                  /* Stepper */
+                                  <div className="bg-muted/10 p-5 rounded-xl border border-border/50 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
+                                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4 relative z-10">
+                                      {statusSteps.map((step, index) => {
+                                        const mappedStatus = order.status === "COMPLETED" ? "DELIVERED" : order.status;
+                                        const currentStepIndex = statusSteps.findIndex(s => s.id === mappedStatus);
+                                        const isCompleted = index <= currentStepIndex;
+                                        const isActive = index === currentStepIndex;
+
+                                        return (
+                                          <div key={step.id} className="flex flex-row md:flex-col items-center gap-4 md:gap-2 text-center md:flex-1 relative w-full md:w-auto">
+                                            {/* Line Connector for Desktop */}
+                                            {index < statusSteps.length - 1 && (
+                                              <div className="hidden md:block absolute top-5 left-1/2 w-full h-0.5 bg-border -z-10">
+                                                <div 
+                                                  className="h-full bg-primary transition-all duration-500" 
+                                                  style={{ width: isCompleted && index < currentStepIndex ? "100%" : "0%" }}
+                                                />
+                                              </div>
+                                            )}
+                                            
+                                            <div className={cn(
+                                              "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all shrink-0",
+                                              isCompleted ? "bg-primary border-primary text-primary-foreground shadow-md" : "bg-muted border-border text-muted-foreground",
+                                              isActive && "ring-4 ring-primary/20 scale-110"
+                                            )}>
+                                              <step.icon className="w-4 h-4" />
+                                            </div>
+                                            <div className="text-left md:text-center">
+                                              <p className={cn("text-[10px] font-black uppercase tracking-widest", isCompleted ? "text-primary" : "text-muted-foreground")}>
+                                                {step.label}
+                                              </p>
+                                              {isActive && <p className="text-[8px] font-bold text-primary animate-pulse">Live Updates Active</p>}
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Detailed Grid: Products & Delivery Info */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                                  {/* Order Items */}
+                                  <div className="space-y-3">
+                                    <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                                      <Package className="w-3.5 h-3.5 text-primary" /> Products Ordered
+                                    </h4>
+                                    <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border">
+                                      {order.items?.map((item: any) => (
+                                        <div key={item.id} className="flex items-center justify-between text-xs pb-3 border-b border-border/50 last:border-0 last:pb-0">
+                                          <div className="flex items-center gap-2.5">
+                                            {item.product?.images?.[0] && (
+                                              <img 
+                                                src={item.product.images[0]} 
+                                                alt={item.product.name} 
+                                                className="w-9 h-9 object-cover rounded bg-muted border border-border"
+                                              />
+                                            )}
+                                            <div>
+                                              <p className="font-bold text-foreground">{item.product?.name || "Product"}</p>
+                                              <p className="text-[10px] text-muted-foreground">
+                                                Qty: {item.quantity} {item.size && `| Size: ${item.size}`} {item.color && `| Color: ${item.color}`}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <span className="font-bold text-primary">${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+                                        </div>
+                                      ))}
+                                      <div className="pt-2 flex justify-between items-center text-xs font-semibold">
+                                        <span className="text-muted-foreground">Subtotal:</span>
+                                        <span className="text-foreground">${parseFloat(order.totalAmount).toFixed(2)}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Delivery & Actions */}
+                                  <div className="space-y-3">
+                                    <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                                      <MapPin className="w-3.5 h-3.5 text-primary" /> Shipping Address
+                                    </h4>
+                                    <div className="bg-muted/20 p-4 rounded-xl border border-border space-y-3 flex flex-col justify-between h-[calc(100%-28px)]">
+                                      <div className="text-xs text-muted-foreground leading-relaxed">
+                                        <p className="font-bold text-foreground mb-1">{order.user?.name || "Recipient"}</p>
+                                        {order.address ? (
+                                          <>
+                                            {order.address.street}<br />
+                                            {order.address.city}, {order.address.state} {order.address.postalCode}<br />
+                                            {order.address.country}
+                                          </>
+                                        ) : (
+                                          "Address details unavailable"
+                                        )}
+                                      </div>
+                                      <div className="pt-3 border-t border-border/50 flex flex-col sm:flex-row gap-2">
+                                        <Button asChild size="sm" className="bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-[10px] uppercase tracking-wider flex-1 h-9">
+                                          <Link href={`/track-order?orderId=${order.id}`}>
+                                            Live Tracking Page
+                                          </Link>
+                                        </Button>
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          onClick={() => setExpandedOrderId(null)}
+                                          className="border-2 font-bold text-[10px] uppercase tracking-wider h-9"
+                                        >
+                                          Collapse
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </Card>
                     </motion.div>
                   ))}

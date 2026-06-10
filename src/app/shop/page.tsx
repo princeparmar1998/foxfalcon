@@ -6,11 +6,11 @@ import { Filter, Search, ChevronDown, Heart, ShoppingBag, Loader2, Package } fro
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
@@ -59,12 +59,12 @@ export default function ShopPage() {
   // Filter & sort
   const filteredProducts = products
     .filter((p) => {
-      const matchCategory = selectedCategory === "All" || 
+      const matchCategory = selectedCategory === "All" ||
         p.category?.name?.toLowerCase() === selectedCategory.toLowerCase();
-      
+
       const query = searchQuery.toLowerCase().trim();
-      const matchSearch = !query || 
-        p.name?.toLowerCase().includes(query) || 
+      const matchSearch = !query ||
+        p.name?.toLowerCase().includes(query) ||
         p.description?.toLowerCase().includes(query) ||
         p.category?.name?.toLowerCase().includes(query);
 
@@ -102,12 +102,12 @@ export default function ShopPage() {
             {loading ? "Loading catalog..." : `${filteredProducts.length} items catalogued in database`}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative flex-grow md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search catalog..." 
+            <Input
+              placeholder="Search catalog..."
               className="pl-10 h-11 bg-muted/30 border-border focus-visible:ring-primary/40 rounded-xl"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -121,7 +121,7 @@ export default function ShopPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52 bg-card border-border">
               {SORT_OPTIONS.map((opt) => (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   key={opt.value}
                   onClick={() => setSortBy(opt.value)}
                   className={`font-bold uppercase tracking-wider text-xs cursor-pointer ${sortBy === opt.value ? "text-primary font-black" : ""}`}
@@ -144,7 +144,7 @@ export default function ShopPage() {
               onClick={() => setSelectedCategory(cat)}
               className={cn(
                 "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap active-scale",
-                isActive 
+                isActive
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                   : "bg-muted/30 border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
               )}
@@ -186,10 +186,10 @@ export default function ShopPage() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="group relative overflow-hidden bg-transparent border-none shadow-none rounded-2xl">
-                    <Link href={`/shop/${product.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-2xl border border-border/40 bg-muted/20">
-                      <Image 
-                        src={imageSrc} 
+                  <Card className="group relative overflow-hidden bg-card/30 backdrop-blur-md border border-border/50 hover:border-primary/30 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-lg shadow-black/20 ring-0">
+                    <Link href={`/shop/${product.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-xl border border-border/40 bg-black/40">
+                      <Image
+                        src={imageSrc}
                         alt={product.name}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -211,9 +211,9 @@ export default function ShopPage() {
                         </Badge>
                       )}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                        <Button 
-                          size="icon" 
-                          variant="secondary" 
+                        <Button
+                          size="icon"
+                          variant="secondary"
                           className={cn(
                             "rounded-full w-10 h-10 shadow-xl hover:scale-110 transition-transform",
                             wishlist.isInWishlist(product.id) ? "bg-red-500 text-white hover:bg-red-600 border-none" : ""
@@ -231,8 +231,8 @@ export default function ShopPage() {
                         >
                           <Heart className={cn("w-4.5 h-4.5", wishlist.isInWishlist(product.id) ? "fill-white text-white" : "")} />
                         </Button>
-                        <Button 
-                          size="icon" 
+                        <Button
+                          size="icon"
                           className="rounded-full w-10 h-10 shadow-xl hover:scale-110 transition-transform bg-primary"
                           disabled={isOutOfStock}
                         >
@@ -240,15 +240,15 @@ export default function ShopPage() {
                         </Button>
                       </div>
                     </Link>
-                    
-                    <div className="pt-3 space-y-0.5">
+
+                    <div className="mt-3 px-1 space-y-1">
                       <div className="flex justify-between items-baseline gap-2">
                         <Link href={`/shop/${product.id}`} className="block flex-1 min-w-0">
-                          <h3 className="text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors truncate">
+                          <h3 className="text-xs md:text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors truncate">
                             {product.name}
                           </h3>
                         </Link>
-                        <span className="text-sm font-black text-primary shrink-0">${parseFloat(product.price).toFixed(2)}</span>
+                        <span className="text-xs md:text-sm font-black text-primary shrink-0 font-mono">${parseFloat(product.price).toFixed(2)}</span>
                       </div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         {product.category?.name || "Uncategorized"}

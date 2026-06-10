@@ -63,6 +63,13 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const searchParam = params.get("search");
+      if (searchParam) {
+        setSearch(searchParam);
+      }
+    }
   }, []);
 
   // Update order status in db and trigger Pusher
@@ -186,6 +193,9 @@ export default function AdminOrdersPage() {
                             <div className="h-px bg-muted my-1" />
                             <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'PENDING')} className="font-bold cursor-pointer">
                               <Clock className="w-4 h-4 mr-2 text-yellow-500" /> Mark as Pending
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'PROCESSING')} className="font-bold cursor-pointer">
+                              <Package className="w-4 h-4 mr-2 text-primary" /> Mark as Processing
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleUpdateStatus(order.id, 'COMPLETED')} className="font-bold cursor-pointer">
                               <CheckCircle2 className="w-4 h-4 mr-2 text-green-500" /> Mark as Complete
