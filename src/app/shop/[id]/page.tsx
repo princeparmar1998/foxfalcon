@@ -241,7 +241,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight uppercase text-foreground">{product.name}</h1>
-            <p className="text-3xl font-black text-primary font-mono">${parseFloat(product.price).toFixed(2)}</p>
+            <p className="text-3xl font-black text-primary font-mono">₹{parseFloat(product.price).toFixed(2)}</p>
           </div>
 
           <p className="text-muted-foreground leading-relaxed text-sm">
@@ -298,18 +298,23 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <Plus className="w-4 h-4" />
               </button>
             </div>
-            <Button 
-              onClick={handleAddToCart}
-              className={cn(
-                "flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale",
-                isAddedToCart 
-                  ? "bg-red-600 hover:bg-red-700 text-white" 
-                  : "bg-primary hover:bg-primary/95 text-primary-foreground"
-              )}
-            >
-              <ShoppingBag className="w-5 h-5 mr-2 group-hover:animate-bounce" /> 
-              {isAddedToCart ? "Remove from Cart" : "Add to Cart"}
-            </Button>
+            {isAddedToCart ? (
+              <Button 
+                asChild
+                className="flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Link href="/cart" className="flex items-center justify-center">
+                  <ShoppingBag className="w-5 h-5 mr-2" /> View in Cart
+                </Link>
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleAddToCart}
+                className="flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale bg-primary hover:bg-primary/95 text-primary-foreground"
+              >
+                <ShoppingBag className="w-5 h-5 mr-2 group-hover:animate-bounce" /> Add to Cart
+              </Button>
+            )}
             <Button 
               size="icon" 
               variant="outline" 
@@ -334,7 +339,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <Truck className="w-5 h-5 text-primary" />
               <div className="space-y-0.5">
                 <p className="text-xs font-black uppercase tracking-wider text-foreground">Free Shipping</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold">On orders over $99</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold">On orders over ₹100</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -378,7 +383,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             <div className="flex flex-col lg:flex-row gap-12">
               {/* Rating Stats Summary */}
               <div className="lg:w-80 space-y-6 shrink-0">
-                <Card className="p-6 border-border bg-card/30 backdrop-blur-md">
+                <Card className="p-6 border border-border bg-card shadow-md dark:shadow-black/40">
                   <div className="text-center space-y-2">
                     <span className="text-5xl font-black text-primary font-mono">
                       {reviews.length > 0 
@@ -605,7 +610,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Your Thoughts *</label>
               <textarea
-                className="w-full min-h-[120px] rounded-xl border border-border bg-muted/20 px-3 py-2 text-sm focus-visible:outline-none text-foreground bg-black"
+                className="w-full min-h-[120px] rounded-xl border border-border bg-muted/30 px-3 py-2 text-sm focus-visible:outline-none text-foreground focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:border-primary"
                 placeholder="Write your review here... Is the sizing accurate? How is the fabric quality?"
                 value={commentInput}
                 onChange={(e) => setCommentInput(e.target.value)}

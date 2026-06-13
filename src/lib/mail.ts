@@ -56,10 +56,10 @@ export async function sendOrderNotificationEmail(orderId: string) {
             ${item.quantity}
           </td>
           <td style="padding: 12px; border-bottom: 1px solid #E2E8F0; text-align: right; color: #4A5568;">
-            $${itemPrice}
+            ₹${itemPrice}
           </td>
           <td style="padding: 12px; border-bottom: 1px solid #E2E8F0; text-align: right; font-weight: 600; color: #1A202C;">
-            $${itemTotal}
+            ₹${itemTotal}
           </td>
         </tr>
       `;
@@ -132,7 +132,7 @@ export async function sendOrderNotificationEmail(orderId: string) {
                     <!-- Total Row -->
                     <tr>
                       <td colspan="3" style="padding: 16px 12px; text-align: right; font-weight: 700; color: #4A5568; font-size: 16px;">Grand Total:</td>
-                      <td style="padding: 16px 12px; text-align: right; font-weight: 800; color: #ED8936; font-size: 18px; border-top: 2px solid #E2E8F0;">$${totalAmount}</td>
+                      <td style="padding: 16px 12px; text-align: right; font-weight: 800; color: #ED8936; font-size: 18px; border-top: 2px solid #E2E8F0;">₹${totalAmount}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -176,9 +176,9 @@ export async function sendOrderNotificationEmail(orderId: string) {
       console.log("Items:");
       order.items.forEach((item) => {
         const productName = item.product?.name || "Custom Designer Item";
-        console.log(`  - ${productName} (x${item.quantity}) - $${parseFloat(item.price.toString()).toFixed(2)}`);
+        console.log(`  - ${productName} (x${item.quantity}) - ₹${parseFloat(item.price.toString()).toFixed(2)}`);
       });
-      console.log(`Grand Total: $${totalAmount}`);
+      console.log(`Grand Total: ₹${totalAmount}`);
       console.log(`Admin Link: ${adminOrderUrl}`);
       console.log("==================================================================\n");
       return { success: true, mode: "fallback_console_logged" };
@@ -272,10 +272,10 @@ export async function sendUserOrderStatusEmail(orderId: string, status: string) 
             ${item.quantity}
           </td>
           <td style="padding: 12px; border-bottom: 1px solid #E2E8F0; text-align: right; color: #4A5568;">
-            $${itemPrice}
+            ₹${itemPrice}
           </td>
           <td style="padding: 12px; border-bottom: 1px solid #E2E8F0; text-align: right; font-weight: 600; color: #1A202C;">
-            $${itemTotal}
+            ₹${itemTotal}
           </td>
         </tr>
       `;
@@ -330,7 +330,7 @@ export async function sendUserOrderStatusEmail(orderId: string, status: string) 
                     <!-- Total Row -->
                     <tr>
                       <td colspan="3" style="padding: 16px 12px; text-align: right; font-weight: 700; color: #4A5568; font-size: 16px;">Grand Total:</td>
-                      <td style="padding: 16px 12px; text-align: right; font-weight: 800; color: #ED8936; font-size: 18px; border-top: 2px solid #E2E8F0;">$${totalAmount}</td>
+                      <td style="padding: 16px 12px; text-align: right; font-weight: 800; color: #ED8936; font-size: 18px; border-top: 2px solid #E2E8F0;">₹${totalAmount}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -376,7 +376,7 @@ export async function sendUserOrderStatusEmail(orderId: string, status: string) 
       console.log("------------------------------------------------------------------");
       console.log(`Customer: ${customerName} (${customerEmail})`);
       console.log(`Status: ${status}`);
-      console.log(`Grand Total: $${totalAmount}`);
+      console.log(`Grand Total: ₹${totalAmount}`);
       console.log(`Track Link: ${trackOrderUrl}`);
       console.log("==================================================================\n");
       return { success: true, mode: "fallback_console_logged" };

@@ -186,8 +186,8 @@ export default function ShopPage() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="group relative overflow-hidden bg-card/30 backdrop-blur-md border border-border/50 hover:border-primary/30 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-lg shadow-black/20 ring-0">
-                    <Link href={`/shop/${product.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-xl border border-border/40 bg-black/40">
+                  <Card className="group relative overflow-hidden bg-card border border-border hover:border-primary/60 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-md hover:shadow-lg dark:shadow-black/40 ring-0">
+                    <Link href={`/shop/${product.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-xl border border-border/40 bg-muted">
                       <Image
                         src={imageSrc}
                         alt={product.name}
@@ -236,7 +236,7 @@ export default function ShopPage() {
                           className="rounded-full w-10 h-10 shadow-xl hover:scale-110 transition-transform bg-primary"
                           disabled={isOutOfStock}
                         >
-                          <ShoppingBag className="w-4.5 h-4.5" />
+                          <ShoppingBag className="w-4.5 h-4.5 text-primary-foreground" />
                         </Button>
                       </div>
                     </Link>
@@ -248,7 +248,7 @@ export default function ShopPage() {
                             {product.name}
                           </h3>
                         </Link>
-                        <span className="text-xs md:text-sm font-black text-primary shrink-0 font-mono">${parseFloat(product.price).toFixed(2)}</span>
+                        <span className="text-xs md:text-sm font-black text-primary shrink-0 font-mono">₹{parseFloat(product.price).toFixed(2)}</span>
                       </div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                         {product.category?.name || "Uncategorized"}

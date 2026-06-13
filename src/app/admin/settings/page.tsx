@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import { Settings, ShieldAlert, Database, Globe, Bell, Palette, Save, AlertTriangle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 const Label = ({ children }: { children: React.ReactNode }) => (
   <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground block mb-2">{children}</label>
@@ -13,6 +15,12 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 
 export default function AdminSettingsPage() {
   const { data: session } = useSession();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -36,7 +44,7 @@ export default function AdminSettingsPage() {
               </div>
               <div className="space-y-1">
                 <Label>Store URL</Label>
-                <Input defaultValue={process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"} disabled className="bg-muted/10 border-border opacity-50 font-mono text-xs cursor-not-allowed" />
+                <Input defaultValue={process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"} disabled className="bg-muted/50 border-border text-muted-foreground font-mono text-xs cursor-not-allowed" />
               </div>
               <div className="space-y-1">
                 <Label>Support Email</Label>
@@ -81,18 +89,22 @@ export default function AdminSettingsPage() {
               <div className="space-y-1">
                 <Label>Theme</Label>
                 <div className="flex gap-2 bg-muted/30 p-1 rounded-xl border border-border w-fit">
-                  {["Dark", "Light", "System"].map((t) => (
-                    <button
-                      key={t}
-                      className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 ${
-                        t === "Dark"
-                          ? "bg-primary text-primary-foreground shadow-lg"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
+                  {["dark", "light", "system"].map((t) => {
+                    const isActive = mounted && theme === t;
+                    return (
+                      <button
+                        key={t}
+                        onClick={() => setTheme(t)}
+                        className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 ${
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-lg"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

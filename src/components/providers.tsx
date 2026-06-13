@@ -7,7 +7,7 @@ import { ThemeProvider } from "next-themes";
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <SessionProvider>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem={true} disableTransitionOnChange>
         {children}
         <Toaster position="bottom-right" richColors />
       </ThemeProvider>

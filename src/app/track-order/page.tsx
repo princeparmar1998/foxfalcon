@@ -227,7 +227,7 @@ export default function TrackOrderPage() {
                         </p>
                       </div>
                     </div>
-                    <span className="font-bold">${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+                    <span className="font-bold">₹{(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
                 
@@ -236,7 +236,7 @@ export default function TrackOrderPage() {
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-semibold">${parseFloat(orderData.totalAmount).toFixed(2)}</span>
+                    <span className="font-semibold">₹{parseFloat(orderData.totalAmount).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
@@ -244,7 +244,7 @@ export default function TrackOrderPage() {
                   </div>
                   <div className="flex justify-between font-black text-lg pt-2 text-primary">
                     <span>Total Amount</span>
-                    <span>${parseFloat(orderData.totalAmount).toFixed(2)}</span>
+                    <span>₹{parseFloat(orderData.totalAmount).toFixed(2)}</span>
                   </div>
                 </div>
 

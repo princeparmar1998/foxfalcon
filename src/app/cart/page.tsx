@@ -50,10 +50,10 @@ export default function CartPage() {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.2 }}
               >
-                <Card className="p-6 border-border bg-card/60 flex flex-col sm:flex-row gap-6 relative overflow-hidden group hover:border-primary/20 transition-all duration-300">
+                <Card className="p-6 border border-border bg-card flex flex-col sm:flex-row gap-6 relative overflow-hidden group hover:border-primary/40 transition-all duration-300 shadow-md hover:shadow-lg dark:shadow-black/40">
                   <div className="absolute top-0 left-0 w-[3px] h-full bg-primary/0 group-hover:bg-primary transition-all duration-300" />
                   
-                  <div className="relative w-full sm:w-28 aspect-square rounded-xl overflow-hidden bg-black border border-border">
+                  <div className="relative w-full sm:w-28 aspect-square rounded-xl overflow-hidden bg-muted border border-border">
                     <Image src={item.image} alt={item.name} fill className="object-cover" />
                   </div>
 
@@ -66,7 +66,7 @@ export default function CartPage() {
                           {item.color && <span>Color: <span className="text-primary font-mono">{item.color}</span></span>}
                         </div>
                       </div>
-                      <p className="text-lg font-black text-primary font-mono">${item.price.toFixed(2)}</p>
+                      <p className="text-lg font-black text-primary font-mono">₹{item.price.toFixed(2)}</p>
                     </div>
 
                     <div className="flex justify-between items-center">
@@ -109,21 +109,21 @@ export default function CartPage() {
             <div className="space-y-4 text-xs font-bold uppercase tracking-wider">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-mono text-foreground">${subtotal.toFixed(2)}</span>
+                <span className="font-mono text-foreground">₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Shipping</span>
-                <span className="font-mono text-foreground">{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
+                <span className="font-mono text-foreground">{shipping === 0 ? "FREE" : `₹${shipping.toFixed(2)}`}</span>
               </div>
               {shipping > 0 && (
                 <p className="text-[9px] text-primary font-black uppercase tracking-widest leading-relaxed">
-                  * Add ${ (100 - subtotal).toFixed(2) } more for FREE shipping
+                  * Add ₹{ (100 - subtotal).toFixed(2) } more for FREE shipping
                 </p>
               )}
               <Separator className="bg-border" />
               <div className="flex justify-between text-lg font-black text-foreground">
                 <span>Total</span>
-                <span className="text-primary font-mono">${total.toFixed(2)}</span>
+                <span className="text-primary font-mono">₹{total.toFixed(2)}</span>
               </div>
             </div>
 

@@ -30,6 +30,7 @@ export const userApi = {
   updateProfile: (data: any) => api.put("/api/user/profile", data).then((res) => res.data),
   createAddress: (data: any) => api.post("/api/user/addresses", data).then((res) => res.data),
   deleteAddress: (id: string) => api.delete(`/api/user/addresses?id=${id}`).then((res) => res.data),
+  getLoyalty: () => api.get("/api/user/loyalty").then((res) => res.data),
 };
 
 export const checkoutApi = {

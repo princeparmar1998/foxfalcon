@@ -74,7 +74,7 @@ export default function CollectionsPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.6 }}
-            className="group relative flex flex-col justify-end aspect-[4/5] rounded-3xl overflow-hidden bg-black border border-border/40 hover:border-primary/40 transition-all duration-500 shadow-2xl shadow-black/80"
+            className="group relative flex flex-col justify-end aspect-[4/5] rounded-3xl overflow-hidden bg-black border border-border hover:border-primary/60 transition-all duration-500 shadow-2xl shadow-black/80"
           >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Truck, ShieldCheck, ArrowRight, Loader2, MapPin, ChevronDown, Plus, BadgePercent } from "lucide-react";
+import { CreditCard, Truck, ShieldCheck, ArrowRight, Loader2, MapPin, ChevronDown, Plus, BadgePercent, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -20,6 +20,117 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+
+function ConfettiEmitter() {
+  const [particles, setParticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    const colors = ["#f97316", "#3b82f6", "#22c55e", "#eab308", "#ec4899", "#a855f7"];
+    
+    const spawnBatch = (batchId: number) => {
+      const newBatch = Array.from({ length: 45 }).map((_, i) => ({
+        id: `${batchId}-${i}`,
+        x: Math.random() * 80 - 40,
+        y: Math.random() * 80 - 40,
+        angle: Math.random() * 360,
+        speed: 12 + Math.random() * 25,
+        rotation: Math.random() * 720,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 5 + Math.random() * 8,
+        shape: Math.random() > 0.5 ? "circle" : "square",
+        duration: 1.8 + Math.random() * 2.5,
+      }));
+      setParticles((prev) => [...prev, ...newBatch]);
+    };
+
+    // Spawn 3 waves of confetti for a continuous celebration effect
+    spawnBatch(0);
+    const t1 = setTimeout(() => spawnBatch(1), 500);
+    const t2 = setTimeout(() => spawnBatch(2), 1200);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-50">
+      {particles.map((p) => {
+        const rad = (p.angle * Math.PI) / 180;
+        const targetX = Math.cos(rad) * p.speed * 15 + p.x;
+        const targetY = Math.sin(rad) * p.speed * 15 - 200 + p.y;
+        
+        return (
+          <motion.div
+            key={p.id}
+            initial={{ x: "50vw", y: "50vh", scale: 0, rotate: 0, opacity: 1 }}
+            animate={{
+              x: `calc(50vw + ${targetX}px)`,
+              y: `calc(50vh + ${targetY}px)`,
+              scale: [0, 1.2, 1, 0.6, 0],
+              rotate: p.rotation,
+              opacity: [1, 1, 0.8, 0],
+            }}
+            transition={{ duration: p.duration, ease: "easeOut" }}
+            style={{
+              position: "absolute",
+              width: p.size,
+              height: p.size,
+              backgroundColor: p.color,
+              borderRadius: p.shape === "circle" ? "50%" : "2px",
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+function FloatingCheers() {
+  const emojis = ["🥳", "🎉", "🔥", "⚡", "🛍️", "🙌", "✨", "👑"];
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const newItems = Array.from({ length: 18 }).map((_, i) => ({
+      id: i,
+      emoji: emojis[Math.floor(Math.random() * emojis.length)],
+      delay: Math.random() * 2.5,
+      left: 5 + Math.random() * 90, // percentage span across the viewport width
+      duration: 4 + Math.random() * 3,
+      size: 24 + Math.random() * 24,
+    }));
+    setItems(newItems);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-40">
+      {items.map((item) => (
+        <motion.div
+          key={item.id}
+          initial={{ y: "110vh", opacity: 0, x: `${item.left}vw` }}
+          animate={{
+            y: "-15vh",
+            opacity: [0, 1, 1, 0],
+            x: `calc(${item.left}vw + ${Math.sin(item.id) * 60}px)`,
+          }}
+          transition={{
+            duration: item.duration,
+            delay: item.delay,
+            ease: "easeOut",
+          }}
+          style={{
+            position: "absolute",
+            fontSize: item.size,
+          }}
+        >
+          {item.emoji}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 const Separator = ({ className }: { className?: string }) => (
   <div className={cn("h-px w-full bg-border", className)} />
@@ -28,6 +139,7 @@ const Separator = ({ className }: { className?: string }) => (
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -55,9 +167,29 @@ export default function CheckoutPage() {
   const [cardName, setCardName] = useState("");
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const [loyaltyData, setLoyaltyData] = useState<any>(null);
+  const [applyLoyaltyDiscount, setApplyLoyaltyDiscount] = useState(false);
+
+  useEffect(() => {
+    if (!session) return;
+    const loadLoyalty = async () => {
+      try {
+        const data = await userApi.getLoyalty();
+        setLoyaltyData(data);
+        if (data?.isRewardReady) {
+          setApplyLoyaltyDiscount(true);
+        }
+      } catch (err) {
+        console.error("Failed to load loyalty status", err);
+      }
+    };
+    loadLoyalty();
+  }, [session]);
+
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shipping = subtotal > 100 ? 0 : 10;
-  const total = subtotal + shipping;
+  const loyaltyDiscount = applyLoyaltyDiscount && loyaltyData?.isRewardReady ? 100.00 : 0;
+  const total = Math.max(0, subtotal + shipping - loyaltyDiscount);
 
   // Load user's saved addresses
   useEffect(() => {
@@ -141,17 +273,13 @@ export default function CheckoutPage() {
         items, 
         addressId,
         paymentMethod,
-        cardDetails: paymentMethod === "CARD" ? { cardNumber, cardExpiry, cardCvc, cardName } : null
+        cardDetails: paymentMethod === "CARD" ? { cardNumber, cardExpiry, cardCvc, cardName } : null,
+        applyLoyaltyDiscount
       });
 
       if (data.success) {
-        showToast.success(
-          paymentMethod === "CARD" 
-            ? "Dummy Card Payment Successful! Order Placed." 
-            : "Cash on Delivery selected! Order Placed Successfully."
-        );
+        setShowCelebration(true);
         clearCart();
-        router.push("/profile");
       } else {
         throw new Error("Checkout session failed");
       }
@@ -163,12 +291,12 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !showCelebration) {
       router.push("/cart");
     }
-  }, [items, router]);
+  }, [items, router, showCelebration]);
 
-  if (items.length === 0) {
+  if (items.length === 0 && !showCelebration) {
     return null;
   }
 
@@ -530,7 +658,7 @@ export default function CheckoutPage() {
               <Loader2 className="w-5 h-5 animate-spin text-primary-foreground" />
             ) : (
               <>
-                Complete Order (${total.toFixed(2)}) <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Complete Order (₹{total.toFixed(2)}) <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </Button>
@@ -543,13 +671,13 @@ export default function CheckoutPage() {
 
         {/* Order Summary */}
         <div className="lg:col-span-5 space-y-6">
-          <Card className="p-8 border border-border bg-card/60 rounded-2xl sticky top-32">
+          <Card className="p-8 border border-border bg-card rounded-2xl sticky top-32 shadow-lg dark:shadow-black/40">
             <h2 className="text-2xl font-black tracking-tighter mb-6 uppercase">ORDER SUMMARY</h2>
             
             <div className="space-y-5 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
               {items.map((item) => (
                 <div key={`${item.id}-${item.size}`} className="flex gap-4">
-                  <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-black border border-border shrink-0">
+                  <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-muted border border-border shrink-0">
                     {item.image ? (
                       <Image src={item.image} alt={item.name} fill className="object-cover animate-fade-in" unoptimized />
                     ) : (
@@ -561,7 +689,7 @@ export default function CheckoutPage() {
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                       Qty: <span className="font-mono text-primary">{item.quantity}</span>{item.size ? ` | Size: ${item.size}` : ""}{item.color ? ` | Color: ${item.color}` : ""}
                     </p>
-                    <p className="text-sm font-black text-primary font-mono">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-black text-primary font-mono">₹{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -570,24 +698,101 @@ export default function CheckoutPage() {
             <div className="mt-8 pt-6 border-t border-border/60 space-y-4 text-xs font-bold uppercase tracking-wider">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-mono text-foreground">${subtotal.toFixed(2)}</span>
+                <span className="font-mono text-foreground">₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Shipping</span>
-                <span className="font-mono text-foreground">{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
+                <span className="font-mono text-foreground">{shipping === 0 ? "FREE" : `₹${shipping.toFixed(2)}`}</span>
               </div>
               {shipping === 0 && (
                 <p className="text-[9px] text-green-500 font-black uppercase tracking-widest">🎉 Free shipping applied to order!</p>
               )}
+
+              {/* Loyalty reward discount display */}
+              {loyaltyData?.isRewardReady && (
+                <div className="flex items-center justify-between p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-black text-[10px]">🎁 LOYALTY CASHBACK ACTIVE</span>
+                    <span className="text-[8px] text-primary/80 lowercase tracking-normal">Applying ₹100 cashback reward to checkout</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="applyLoyalty"
+                      checked={applyLoyaltyDiscount}
+                      onChange={(e) => setApplyLoyaltyDiscount(e.target.checked)}
+                      className="w-4 h-4 accent-primary cursor-pointer"
+                    />
+                    <span className="font-mono text-sm font-black">-₹{loyaltyDiscount.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
               <Separator className="bg-border/60" />
               <div className="flex justify-between text-lg font-black text-foreground">
                 <span>Total</span>
-                <span className="text-primary font-mono">${total.toFixed(2)}</span>
+                <span className="text-primary font-mono">₹{total.toFixed(2)}</span>
               </div>
             </div>
           </Card>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showCelebration && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in">
+            <ConfettiEmitter />
+            <FloatingCheers />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="max-w-md w-full mx-4 p-8 bg-zinc-950 border border-zinc-800 rounded-3xl text-center space-y-6 relative overflow-hidden shadow-2xl shadow-primary/10"
+            >
+              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
+              <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+              
+              <div className="w-16 h-16 bg-primary/10 border border-primary/20 text-primary rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/10 animate-bounce">
+                <Sparkles className="w-8 h-8" />
+              </div>
+
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black tracking-tighter text-white uppercase leading-none">ORDER SECURED!</h2>
+                <p className="text-zinc-400 text-xs font-medium">Instinct meets power. Your custom drop is now in production.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-900/60 border border-zinc-850 text-left space-y-2.5 text-xs font-mono">
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">PAYMENT TYPE //</span>
+                  <span className="text-foreground font-black">{paymentMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">STAMP STATUS //</span>
+                  <span className="text-primary font-black">+1 SLOT STAMPED</span>
+                </div>
+                {applyLoyaltyDiscount && loyaltyData?.isRewardReady && (
+                  <div className="flex justify-between text-green-500">
+                    <span>CASHBACK REDEEMED //</span>
+                    <span className="font-black">₹100 DISCOUNT APPLIED</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  onClick={() => {
+                    setShowCelebration(false);
+                    router.push("/profile");
+                  }}
+                  className="w-full h-12 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl active-scale"
+                >
+                  Track Order & Progress
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { useCart } from "@/hooks/use-cart";
 import { showToast } from "@/lib/toast";
 import { adminApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export default function CustomDesignPage() {
   const cart = useCart();
@@ -18,6 +19,9 @@ export default function CustomDesignPage() {
   const [tshirtColor, setTshirtColor] = useState("white");
   const [selectedSize, setSelectedSize] = useState("M");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const customItemId = `custom-${tshirtColor}-${selectedSize}`;
+  const isInCart = cart.items.some(item => item.id === customItemId);
 
   const colors = [
     { name: "white", hex: "#FFFFFF" },
@@ -63,7 +67,7 @@ export default function CustomDesignPage() {
     cart.addItem({
       id: `custom-${tshirtColor}-${selectedSize}`,
       name: `Custom Streetwear Tee (${tshirtColor.toUpperCase()})`,
-      price: 24.99,
+      price: 999.00,
       image: selectedImage,
       quantity: 1,
       size: selectedSize,
@@ -248,11 +252,19 @@ export default function CustomDesignPage() {
             <div className="space-y-3 pt-6 border-t border-border/80">
               <div className="flex justify-between items-center text-sm font-black uppercase tracking-wider">
                 <span>Calculated Unit Price</span>
-                <span className="text-primary font-mono text-lg">$24.99</span>
+                <span className="text-primary font-mono text-lg">₹999.00</span>
               </div>
-              <Button onClick={handleAddToCart} className="w-full h-14 text-sm font-black uppercase tracking-widest bg-primary hover:bg-primary/95 rounded-xl active-scale">
-                <ShoppingCart className="w-4.5 h-4.5 mr-2" /> Add Custom Garment
-              </Button>
+              {isInCart ? (
+                <Button asChild className="w-full h-14 text-sm font-black uppercase tracking-widest bg-green-600 hover:bg-green-700 text-white rounded-xl active-scale">
+                  <Link href="/cart" className="flex items-center justify-center">
+                    <ShoppingCart className="w-4.5 h-4.5 mr-2" /> View in Cart
+                  </Link>
+                </Button>
+              ) : (
+                <Button onClick={handleAddToCart} className="w-full h-14 text-sm font-black uppercase tracking-widest bg-primary hover:bg-primary/95 rounded-xl active-scale">
+                  <ShoppingCart className="w-4.5 h-4.5 mr-2" /> Add Custom Garment
+                </Button>
+              )}
             </div>
           </Card>
 

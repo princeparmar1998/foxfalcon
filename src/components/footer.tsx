@@ -25,35 +25,35 @@ const Footer = () => {
         </div>
 
         <div>
-          <h4 className="font-bold mb-4">Shop</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link href="/shop/men" className="hover:text-primary">Men's Wear</Link></li>
-            <li><Link href="/shop/women" className="hover:text-primary">Women's Wear</Link></li>
-            <li><Link href="/shop/accessories" className="hover:text-primary">Accessories</Link></li>
-            <li><Link href="/custom-design" className="hover:text-primary">Custom T-shirts</Link></li>
+          <h4 className="text-xs font-black uppercase tracking-widest text-foreground mb-6">Shop</h4>
+          <ul className="space-y-3 text-sm text-muted-foreground">
+            <li><Link href="/shop/men" className="hover:text-primary transition-colors duration-300">Men's Wear</Link></li>
+            <li><Link href="/shop/women" className="hover:text-primary transition-colors duration-300">Women's Wear</Link></li>
+            <li><Link href="/shop/accessories" className="hover:text-primary transition-colors duration-300">Accessories</Link></li>
+            <li><Link href="/custom-design" className="hover:text-primary transition-colors duration-300">Custom T-shirts</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-bold mb-4">Customer Service</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link href="/contact" className="hover:text-primary">Contact Us</Link></li>
-            <li><Link href="/shipping" className="hover:text-primary">Shipping Info</Link></li>
-            <li><Link href="/returns" className="hover:text-primary">Returns & Exchanges</Link></li>
-            <li><Link href="/track-order" className="hover:text-primary">Track Order</Link></li>
+          <h4 className="text-xs font-black uppercase tracking-widest text-foreground mb-6">Customer Service</h4>
+          <ul className="space-y-3 text-sm text-muted-foreground">
+            <li><Link href="/contact" className="hover:text-primary transition-colors duration-300">Contact Us</Link></li>
+            <li><Link href="/shipping" className="hover:text-primary transition-colors duration-300">Shipping Info</Link></li>
+            <li><Link href="/returns" className="hover:text-primary transition-colors duration-300">Returns & Exchanges</Link></li>
+            <li><Link href="/track-order" className="hover:text-primary transition-colors duration-300">Track Order</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-bold mb-4">Newsletter</h4>
-          <p className="text-sm text-muted-foreground mb-4">Subscribe to get special offers and once-in-a-lifetime deals.</p>
+          <h4 className="text-xs font-black uppercase tracking-widest text-foreground mb-6">Newsletter</h4>
+          <p className="text-sm text-muted-foreground mb-4 leading-relaxed">Subscribe to get special offers and once-in-a-lifetime deals.</p>
           <div className="flex gap-2">
             <input 
               type="email" 
               placeholder="Your email" 
-              className="bg-muted border border-border px-3 py-2 text-sm rounded-md w-full focus:outline-none focus:ring-1 focus:ring-primary"
+              className="bg-muted/50 border border-border text-foreground placeholder:text-muted-foreground/60 px-4 py-2.5 text-sm rounded-lg w-full focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-300"
             />
-            <button className="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium rounded-md hover:bg-primary/90 transition-colors">
+            <button className="bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold rounded-lg hover:bg-primary/90 transition-all duration-300 active:scale-95 shadow-lg shadow-primary/20">
               Join
             </button>
           </div>

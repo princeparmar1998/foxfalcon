@@ -2,12 +2,13 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { 
-  User, 
-  Package, 
-  MapPin, 
-  Settings, 
-  LogOut, 
+import { useTheme } from "next-themes";
+import {
+  User,
+  Package,
+  MapPin,
+  Settings,
+  LogOut,
   ChevronRight,
   ShoppingBag,
   Plus,
@@ -30,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoyaltyCard } from "@/components/LoyaltyCard";
 import { showToast } from "@/lib/toast";
 import { userApi } from "@/lib/api";
 import {
@@ -67,6 +69,12 @@ const statusSteps = [
 
 export default function ProfilePage() {
   const { data: session, update: updateSession } = useSession();
+  const { theme, setTheme } = useTheme();
+  const [mountedTheme, setMountedTheme] = useState(false);
+
+  useEffect(() => {
+    setMountedTheme(true);
+  }, []);
 
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -172,7 +180,7 @@ export default function ProfilePage() {
     try {
       setSavingAddress(true);
       const saved = await userApi.createAddress(newAddress);
-      setAddresses((prev) => newAddress.isDefault 
+      setAddresses((prev) => newAddress.isDefault
         ? [saved, ...prev.map(a => ({ ...a, isDefault: false }))]
         : [...prev, saved]
       );
@@ -232,8 +240,8 @@ export default function ProfilePage() {
                   </Link>
                 </Button>
               )}
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="w-full justify-start font-bold text-destructive hover:bg-destructive/10"
                 onClick={() => signOut({ callbackUrl: "/" })}
               >
@@ -255,8 +263,8 @@ export default function ProfilePage() {
                 const label = status === "COMPLETED"
                   ? "Complete"
                   : status === "REJECTED"
-                  ? "Rejected"
-                  : status.charAt(0) + status.slice(1).toLowerCase();
+                    ? "Rejected"
+                    : status.charAt(0) + status.slice(1).toLowerCase();
 
                 return (
                   <div key={status} className="flex justify-between items-center">
@@ -272,7 +280,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1">
+        <div className="flex-1 space-y-6">
+          <LoyaltyCard className="px-0 py-0 max-w-none w-full" />
+
           <Tabs defaultValue="orders" className="w-full">
             <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-8 mb-8" variant="line">
               <TabsTrigger value="orders" className="data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-4 font-black text-lg bg-transparent border-none">My Orders</TabsTrigger>
@@ -288,9 +298,9 @@ export default function ProfilePage() {
                     <h3 className="font-bold text-sm">Store Administration</h3>
                     <p className="text-xs text-muted-foreground">Monitor all customer transactions and order fulfillment statuses.</p>
                   </div>
-                  <Button 
-                    onClick={() => setViewAllOrders(!viewAllOrders)} 
-                    variant={viewAllOrders ? "default" : "outline"} 
+                  <Button
+                    onClick={() => setViewAllOrders(!viewAllOrders)}
+                    variant={viewAllOrders ? "default" : "outline"}
                     className="font-bold text-xs h-9 px-4 shrink-0"
                   >
                     {viewAllOrders ? "Viewing All Store Orders" : "Viewing My Personal Orders"}
@@ -329,8 +339,8 @@ export default function ProfilePage() {
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
                               <span className="font-black text-lg font-mono text-sm">{order.id.slice(0, 16)}...</span>
-                              <Badge 
-                                variant="outline" 
+                              <Badge
+                                variant="outline"
                                 className={cn("text-[10px] font-black uppercase tracking-widest", statusColor(order.status))}
                               >
                                 {order.status}
@@ -359,12 +369,12 @@ export default function ProfilePage() {
                           </div>
                           <div className="flex items-center gap-4 w-full sm:w-auto justify-between">
                             <span className="text-xl font-black text-primary">
-                              ${parseFloat(order.totalAmount).toFixed(2)}
+                              ₹{parseFloat(order.totalAmount).toFixed(2)}
                             </span>
-                            <Button 
+                            <Button
                               onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
-                              variant="outline" 
-                              size="sm" 
+                              variant="outline"
+                              size="sm"
                               className="border-2 font-bold flex items-center gap-1.5"
                             >
                               <span>Track Order</span>
@@ -410,13 +420,13 @@ export default function ProfilePage() {
                                             {/* Line Connector for Desktop */}
                                             {index < statusSteps.length - 1 && (
                                               <div className="hidden md:block absolute top-5 left-1/2 w-full h-0.5 bg-border -z-10">
-                                                <div 
-                                                  className="h-full bg-primary transition-all duration-500" 
+                                                <div
+                                                  className="h-full bg-primary transition-all duration-500"
                                                   style={{ width: isCompleted && index < currentStepIndex ? "100%" : "0%" }}
                                                 />
                                               </div>
                                             )}
-                                            
+
                                             <div className={cn(
                                               "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all shrink-0",
                                               isCompleted ? "bg-primary border-primary text-primary-foreground shadow-md" : "bg-muted border-border text-muted-foreground",
@@ -449,9 +459,9 @@ export default function ProfilePage() {
                                         <div key={item.id} className="flex items-center justify-between text-xs pb-3 border-b border-border/50 last:border-0 last:pb-0">
                                           <div className="flex items-center gap-2.5">
                                             {item.product?.images?.[0] && (
-                                              <img 
-                                                src={item.product.images[0]} 
-                                                alt={item.product.name} 
+                                              <img
+                                                src={item.product.images[0]}
+                                                alt={item.product.name}
                                                 className="w-9 h-9 object-cover rounded bg-muted border border-border"
                                               />
                                             )}
@@ -462,12 +472,12 @@ export default function ProfilePage() {
                                               </p>
                                             </div>
                                           </div>
-                                          <span className="font-bold text-primary">${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+                                          <span className="font-bold text-primary">₹{(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
                                         </div>
                                       ))}
                                       <div className="pt-2 flex justify-between items-center text-xs font-semibold">
                                         <span className="text-muted-foreground">Subtotal:</span>
-                                        <span className="text-foreground">${parseFloat(order.totalAmount).toFixed(2)}</span>
+                                        <span className="text-foreground">₹{parseFloat(order.totalAmount).toFixed(2)}</span>
                                       </div>
                                     </div>
                                   </div>
@@ -496,9 +506,9 @@ export default function ProfilePage() {
                                             Live Tracking Page
                                           </Link>
                                         </Button>
-                                        <Button 
-                                          variant="outline" 
-                                          size="sm" 
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
                                           onClick={() => setExpandedOrderId(null)}
                                           className="border-2 font-bold text-[10px] uppercase tracking-wider h-9"
                                         >
@@ -546,9 +556,9 @@ export default function ProfilePage() {
                                 </Badge>
                               )}
                             </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               className="h-7 w-7 p-0 text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
                               onClick={() => handleDeleteAddress(address.id)}
                             >
@@ -564,9 +574,9 @@ export default function ProfilePage() {
                       </motion.div>
                     ))}
                   </AnimatePresence>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     className="h-auto py-8 border-2 border-dashed border-border hover:border-primary hover:bg-primary/5 transition-all flex flex-col gap-2"
                     onClick={() => setIsAddressDialogOpen(true)}
                   >
@@ -586,24 +596,45 @@ export default function ProfilePage() {
                 <div className="space-y-4 max-w-md">
                   <div className="space-y-2">
                     <Label>Full Name</Label>
-                    <Input 
+                    <Input
                       value={nameValue}
                       onChange={(e) => setNameValue(e.target.value)}
                       className="bg-muted/30"
                       placeholder="Your name"
                     />
                   </div>
+                  <div className="space-y-2 pt-4 border-t border-border mt-4">
+                    <label className="text-xs font-black uppercase tracking-widest text-muted-foreground block mb-2">Theme Preference</label>
+                    <div className="flex gap-2 bg-muted/30 p-1 rounded-xl border border-border w-fit">
+                      {["dark", "light", "system"].map((t) => {
+                        const isActive = mountedTheme && theme === t;
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setTheme(t)}
+                            className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-all duration-300 ${isActive
+                              ? "bg-primary text-primary-foreground shadow-lg"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                              }`}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <Label>Email Address</Label>
-                    <Input defaultValue={session.user?.email || ""} disabled className="bg-muted/30 opacity-50" />
+                    <Input defaultValue={session.user?.email || ""} disabled className="bg-muted/50 border-border/80 text-muted-foreground cursor-not-allowed" />
                     <p className="text-[10px] text-muted-foreground">Email cannot be changed.</p>
                   </div>
                   <div className="space-y-2">
                     <Label>Account Role</Label>
-                    <Input defaultValue={(session.user as any)?.role || "USER"} disabled className="bg-muted/30 opacity-50" />
+                    <Input defaultValue={(session.user as any)?.role || "USER"} disabled className="bg-muted/50 border-border/80 text-muted-foreground cursor-not-allowed" />
                   </div>
-                  <Button 
-                    onClick={handleSaveName} 
+                  <Button
+                    onClick={handleSaveName}
                     disabled={savingName || nameValue === session.user?.name}
                     className="bg-primary hover:bg-primary/90 font-bold px-8 mt-4 gap-2"
                   >
@@ -630,7 +661,7 @@ export default function ProfilePage() {
           <form onSubmit={handleAddAddress} className="space-y-4 pt-4">
             <div className="space-y-2">
               <Label>Street Address *</Label>
-              <Input 
+              <Input
                 required
                 placeholder="123 Main Street"
                 value={newAddress.street}
@@ -641,7 +672,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>City *</Label>
-                <Input 
+                <Input
                   required
                   placeholder="Mumbai"
                   value={newAddress.city}
@@ -651,7 +682,7 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-2">
                 <Label>State *</Label>
-                <Input 
+                <Input
                   required
                   placeholder="Maharashtra"
                   value={newAddress.state}
@@ -663,7 +694,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Postal Code *</Label>
-                <Input 
+                <Input
                   required
                   placeholder="400001"
                   value={newAddress.postalCode}
@@ -673,7 +704,7 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-2">
                 <Label>Country *</Label>
-                <Input 
+                <Input
                   required
                   placeholder="India"
                   value={newAddress.country}

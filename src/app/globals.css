@@ -11,51 +11,51 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --foreground: 220 39% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 220 39% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 20 90% 55%;
-    /* Fox Falcon Brand Orange */
+    --popover-foreground: 220 39% 10%;
+    --primary: 20 90% 52%;
+    /* Brand Orange - Vermilion */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 10% 45%;
-    /* Sleek Metallic Gray/Silver */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 20 90% 55%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 220 39% 10%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 220 9% 25%; /* Darker slate gray for high contrast light-theme readability */
+    --accent: 20 90% 52%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
+    --border: 0 0% 88%; /* Crisp light gray border on white */
     --input: 0 0% 90%;
-    --ring: 20 90% 55%;
+    --ring: 20 90% 52%;
     --radius: 0.75rem;
+    --shadow-glow: 0 0 15px rgba(249, 115, 22, 0.15);
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 100%;
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 5% 10%;
+    --card-foreground: 240 4% 80%;
+    --popover: 240 8% 6%;
+    --popover-foreground: 0 0% 98%;
     --primary: 20 100% 55%;
-    /* Fox Falcon Brand Orange */
+    /* Cyber Glowing Orange */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 10% 85%;
-    /* Sleek Metallic Silver */
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63%;
+    --secondary: 240 5% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 72%; /* Brighter slate for high dark-theme readability */
     --accent: 20 100% 55%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 240 5% 18%; /* Lighter gray to define cards against dark backdrop */
+    --input: 240 5% 16%;
     --ring: 20 100% 55%;
+    --shadow-glow: 0 0 25px rgba(249, 115, 22, 0.35);
   }
 
   * {
@@ -64,6 +64,8 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), sans-serif;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 

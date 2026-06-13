@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ShoppingBag, Truck, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { LoyaltyCard } from "@/components/LoyaltyCard";
 
 const categories = [
   { name: "Summer Tees", count: "12 Items", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" },
@@ -22,6 +23,9 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-20 pb-20">
       <Hero />
+
+      {/* Loyalty Reward Card */}
+      <LoyaltyCard />
 
       {/* Categories Grid */}
       <section className="container px-6 mx-auto">
@@ -72,16 +76,16 @@ export default function Home() {
 
       {/* Call to Action for Custom Design */}
       <section className="container px-6 mx-auto">
-        <div className="relative rounded-3xl overflow-hidden bg-black py-20 px-10 text-center">
+        <div className="relative rounded-3xl overflow-hidden bg-zinc-950 dark:bg-zinc-900 border border-zinc-800/80 py-20 px-10 text-center shadow-2xl shadow-black/20">
           <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
           <div className="relative z-10 max-w-2xl mx-auto space-y-8">
             <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
-              WEAR YOUR <span className="text-secondary italic underline decoration-secondary">IMAGINATION</span>
+              WEAR YOUR <span className="text-primary italic underline decoration-primary">IMAGINATION</span>
             </h2>
             <p className="text-zinc-400 text-lg">
               Upload your designs or create from scratch. We bring your vision to life on premium quality fabrics.
             </p>
-            <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold h-14 px-10">
+            <Button asChild size="lg" className="bg-white text-black hover:bg-white/90 font-bold h-14 px-10 rounded-xl shadow-lg active-scale">
               <Link href="/custom-design">Start Designing Now</Link>
             </Button>
           </div>

@@ -11,7 +11,7 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { items, addressId, paymentMethod, cardDetails } = await req.json();
+    const { items, addressId, paymentMethod, cardDetails, applyLoyaltyDiscount } = await req.json();
 
     if (!items || items.length === 0) {
       return new NextResponse("No items in cart", { status: 400 });
@@ -43,12 +43,32 @@ export async function POST(req: Request) {
     // COD starts as PENDING, CARD (since dummy payment is mock-completed successfully) starts as PROCESSING
     const initialStatus = paymentMethod === "COD" ? "PENDING" : "PROCESSING";
 
+    // Calculate loyalty reward discount on the server side to prevent client spoofing
+    let loyaltyDiscount = 0;
+    if (applyLoyaltyDiscount) {
+      const completedOrdersCount = await db.order.count({
+        where: {
+          userId: session.user.id,
+          status: {
+            notIn: ["CANCELLED", "REJECTED"],
+          },
+        },
+      });
+      const stampCount = completedOrdersCount % 7;
+      if (stampCount === 0 && completedOrdersCount > 0) {
+        loyaltyDiscount = 100.00; // ₹100 loyalty cashback reward
+      }
+    }
+
+    const subtotal = items.reduce((total: number, item: any) => total + item.price * item.quantity, 0);
+    const totalAmount = Math.max(0, subtotal - loyaltyDiscount);
+
     // Create Order in DB directly
     const order = await db.order.create({
       data: {
         userId: session.user.id,
         addressId: addressId,
-        totalAmount: items.reduce((total: number, item: any) => total + item.price * item.quantity, 0),
+        totalAmount: totalAmount,
         status: initialStatus,
         items: {
           create: verifiedItems.map((item: any) => ({

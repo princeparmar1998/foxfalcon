@@ -35,10 +35,15 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-## Admin Credentials
+## App & Admin Credentials
 
+### Admin Credentials (Seeder)
 Here are the credentials for the seeded Admin account:
 
 - **Admin Email/User ID:** `admin@foxfalcon.com`
 - **Admin Password:** `admin123`
+
+### Android App Settings
+- **Android Application ID (Package Name):** `com.princeparmar.foxfalcon`
+
 

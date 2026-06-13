@@ -51,8 +51,8 @@ export default function WishlistPage() {
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="group relative overflow-hidden bg-card/30 backdrop-blur-md border border-border/50 hover:border-primary/30 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-lg shadow-black/20 ring-0">
-                <div className="relative aspect-[4/5] overflow-hidden bg-black/40 border border-border/40 rounded-xl">
+              <Card className="group relative overflow-hidden bg-card border border-border hover:border-primary/60 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-md hover:shadow-lg dark:shadow-black/40 ring-0">
+                <div className="relative aspect-[4/5] overflow-hidden bg-muted border border-border/40 rounded-xl">
                   <Image 
                     src={item.image} 
                     alt={item.name}
@@ -76,7 +76,7 @@ export default function WishlistPage() {
                     <h3 className="text-xs md:text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors truncate">
                       {item.name}
                     </h3>
-                    <p className="text-xs font-mono font-black text-primary">${item.price.toFixed(2)}</p>
+                    <p className="text-xs font-mono font-black text-primary">₹{item.price.toFixed(2)}</p>
                   </div>
                   
                   <div className="flex gap-2">

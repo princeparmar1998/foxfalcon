@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 
 const Navbar = () => {
@@ -115,27 +116,32 @@ const Navbar = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Search className="w-5 h-5" />
-          </Button>
-          <Link href="/wishlist">
-            <Button variant="ghost" size="icon" className="relative">
-              <Heart className="w-5 h-5" />
-              {wishlistCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              )}
-            </Button>
-          </Link>
-          <Link href="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-black animate-bounce">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+          {session && (
+            <>
+              <Button variant="ghost" size="icon" className="hidden sm:flex">
+                <Search className="w-5 h-5" />
+              </Button>
+              <Link href="/wishlist">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Heart className="w-5 h-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </Button>
+              </Link>
+              <Link href="/cart">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-black animate-bounce">
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+              <ThemeToggle />
+            </>
+          )}
           {session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -143,16 +149,16 @@ const Navbar = () => {
                   {session.user?.name?.split(" ")[0]?.charAt(0)?.toUpperCase() || "U"}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80 bg-[#151515] border border-zinc-800 rounded-3xl p-6 shadow-2xl space-y-6">
+              <DropdownMenuContent align="end" className="w-80 bg-card border border-border rounded-3xl p-6 shadow-2xl space-y-6 text-card-foreground">
                 {/* Header Email */}
-                <div className="text-center text-xs text-zinc-400 font-medium tracking-tight truncate px-2">
+                <div className="text-center text-xs text-muted-foreground font-medium tracking-tight truncate px-2">
                   {session.user?.email}
                 </div>
 
                 {/* Main Profile Info (Gmail Style) */}
                 <div className="flex flex-col items-center text-center space-y-3">
                   {/* Large Avatar */}
-                  <div className="w-20 h-20 rounded-full bg-primary text-primary-foreground font-black text-3xl flex items-center justify-center border-4 border-zinc-800 shadow-lg relative group/avatar select-none">
+                  <div className="w-20 h-20 rounded-full bg-primary text-primary-foreground font-black text-3xl flex items-center justify-center border-4 border-border shadow-lg relative group/avatar select-none">
                     {session.user?.name?.split(" ")[0]?.charAt(0)?.toUpperCase() || "U"}
                   </div>
 
@@ -168,18 +174,18 @@ const Navbar = () => {
                   </div>
 
                   {/* Manage Account Button */}
-                  <Button variant="outline" className="rounded-full border-zinc-700 hover:bg-zinc-800 font-bold px-6 h-10 text-sm mt-2" asChild>
+                  <Button variant="outline" className="rounded-full border-border hover:bg-muted font-bold px-6 h-10 text-sm mt-2" asChild>
                     <Link href="/profile">Manage Your Account</Link>
                   </Button>
                 </div>
 
                 {/* Additional Actions Divider */}
-                <div className="border-t border-zinc-800 pt-4 space-y-2">
+                <div className="border-t border-border pt-4 space-y-2">
                   {session.user?.role === "ADMIN" && (
-                    <DropdownMenuItem asChild className="cursor-pointer font-bold focus:bg-zinc-800 rounded-xl px-4 py-2.5 text-foreground">
+                    <DropdownMenuItem asChild className="cursor-pointer font-bold focus:bg-muted rounded-xl px-4 py-2.5 text-foreground">
                       <Link href="/admin" className="flex items-center w-full justify-between">
                         <span className="flex items-center"><Settings className="w-4 h-4 mr-3 text-primary" /> Admin Dashboard</span>
-                        <ArrowRight className="w-4 h-4 text-zinc-500" />
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -190,7 +196,7 @@ const Navbar = () => {
                   <Button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     variant="outline"
-                    className="rounded-full border-zinc-700 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 font-bold px-8 h-11 text-zinc-300 flex items-center gap-2"
+                    className="rounded-full border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 font-bold px-8 h-11 text-foreground flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" /> Sign Out
                   </Button>

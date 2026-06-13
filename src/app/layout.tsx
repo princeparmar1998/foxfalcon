@@ -34,7 +34,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={cn(
+          geistSans.variable,
+          geistMono.variable,
+          "antialiased min-h-screen flex flex-col font-sans"
+        )}
       >
         <Providers>
           <Navbar />
