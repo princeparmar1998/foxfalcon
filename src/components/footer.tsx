@@ -21,7 +21,7 @@ const Footer = () => {
                 className="object-contain dark:brightness-100 brightness-0 transition-all duration-300" 
               />
             </div>
-            <span className="font-sans font-black tracking-[0.18em] text-2xl uppercase text-foreground select-none leading-none mt-1">
+            <span className="font-sans font-black tracking-[0.18em] text-2xl uppercase text-foreground select-none leading-none mt-[-3px]">
               FOX <span className="text-primary">FALCON</span>
             </span>
           </Link>

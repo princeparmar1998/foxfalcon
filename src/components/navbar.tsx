@@ -85,7 +85,7 @@ const Navbar = () => {
               className={cn("object-contain transition-all duration-300", showTransparent ? "brightness-100" : "dark:brightness-100 brightness-0")} 
             />
           </div>
-          <span className="font-sans font-black tracking-[0.18em] text-[11px] uppercase select-none text-center leading-none mt-0.5">
+          <span className="font-sans font-black tracking-[0.18em] text-[11px] uppercase select-none text-center leading-none mt-[-5px]">
             <span className={cn("transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white")}>FOX </span>
             <span className="text-primary">FALCON</span>
           </span>
