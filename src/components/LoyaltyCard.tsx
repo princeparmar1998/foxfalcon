@@ -78,42 +78,41 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
   if (!session) {
     return (
       <div className={cn("container px-6 mx-auto max-w-4xl py-6", className)}>
-        <div className="relative rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-800/80 p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group">
-          <div className="absolute inset-0 opacity-15 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
+        <div className="relative rounded-3xl overflow-hidden bg-background border border-border/40 p-8 md:p-12 shadow-premium flex flex-col md:flex-row items-center justify-between gap-8 group">
+          <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
           <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none group-hover:bg-primary/10 transition-all duration-700" />
 
           <div className="space-y-4 max-w-lg relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-              <Sparkles className="w-3 h-3" /> Exclusive VIP Club
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-medium tracking-[0.2em] uppercase">
+              <Sparkles className="w-3 h-3" /> Exclusive VIP Circle
             </div>
-            <h2 className="text-3xl font-black tracking-tighter text-white uppercase leading-none">
-              DIGITAL LOYALTY CARD
+            <h2 className="text-3xl font-bold tracking-tight text-foreground uppercase leading-none font-serif">
+              THE ARCHIVE CLUB
             </h2>
-            <p className="text-zinc-400 text-sm leading-relaxed">
-              Earn <span className="text-primary font-bold">₹100 Cashback</span> on your shopping! Every order places one stamp on your VIP card. Collect 7 stamps to unlock your reward instantly.
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              Unlock members-only drops, seasonal priority allocations, and exclusive streetwear archives. Collect 7 purchase references to achieve Elite status.
             </p>
           </div>
 
           <div className="w-full md:w-80 shrink-0 relative z-10">
-            {/* Blurred loyalty card preview as teaser */}
-            <div className="w-full aspect-[1.6/1] rounded-2xl bg-zinc-900/40 border border-zinc-800/60 p-5 flex flex-col justify-between relative overflow-hidden backdrop-blur-sm">
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-[3px] flex flex-col items-center justify-center gap-3 p-6 text-center">
-                <p className="text-xs font-black tracking-widest text-zinc-300 uppercase">Members Only Area</p>
-                <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-white font-bold rounded-lg shadow-lg active-scale">
+            {/* Minimal loyalty card preview as teaser */}
+            <div className="w-full aspect-[1.6/1] rounded-2xl bg-secondary border border-border/60 p-5 flex flex-col justify-between relative overflow-hidden backdrop-blur-sm shadow-sm">
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+                <p className="text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">Members Only Access</p>
+                <Button asChild size="sm" className="bg-foreground hover:bg-foreground/90 text-background font-medium rounded-button shadow-sm px-6">
                   <Link href="/login">Join Us</Link>
                 </Button>
               </div>
 
               <div className="flex justify-between items-start opacity-20">
-                <span className="text-[10px] font-mono font-black text-zinc-500 uppercase tracking-widest">VIP MEMBER //</span>
-                <div className="w-10 h-7 rounded-sm bg-zinc-800" />
+                <span className="text-[9px] font-mono text-foreground uppercase tracking-widest">VIP PASS // LOCK STATUS</span>
               </div>
               <div className="grid grid-cols-7 gap-1.5 opacity-20">
                 {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="aspect-square rounded border border-zinc-700 flex items-center justify-center text-[8px] font-bold text-zinc-600">0{i + 1}</div>
+                  <div key={i} className="h-1 rounded-full bg-foreground" />
                 ))}
               </div>
-              <div className="h-2 w-1/2 bg-zinc-800 rounded opacity-20" />
+              <div className="h-1.5 w-1/3 bg-foreground/20 rounded opacity-20" />
             </div>
           </div>
         </div>
@@ -123,24 +122,24 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
 
   return (
     <div className={cn("container px-6 mx-auto max-w-4xl py-6", className)}>
-      <div className="relative rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-800/80 p-8 md:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8 group">
-        <div className="absolute inset-0 opacity-15 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
+      <div className="relative rounded-3xl overflow-hidden bg-background border border-border/40 p-8 md:p-12 shadow-premium flex flex-col md:flex-row items-center justify-between gap-8 group">
+        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
         <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none group-hover:bg-primary/10 transition-all duration-700" />
 
         {/* Text Details Section */}
         <div className="space-y-5 max-w-md relative z-10 w-full md:w-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-            <Gift className="w-3.5 h-3.5" /> Falcon Stamp Club
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-medium tracking-[0.2em] uppercase">
+            <Gift className="w-3.5 h-3.5" /> ARCHIVE MEMBERSHIP
           </div>
-          <h2 className="text-3xl font-black tracking-tighter text-white uppercase leading-none">
-            {isRewardReady ? "Cashback Reward Unlocked!" : "Your Loyalty Progress"}
+          <h2 className="text-3xl font-bold tracking-tight text-foreground uppercase leading-none font-serif">
+            {isRewardReady ? "VIP Privileges Unlocked" : "Your Archive Status"}
           </h2>
 
           <AnimatePresence mode="wait">
             {loading ? (
-              <div className="flex items-center gap-2 text-zinc-400 text-sm py-2">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
                 <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                <span>Loading stamp details...</span>
+                <span>Synchronizing profile status...</span>
               </div>
             ) : isRewardReady ? (
               <motion.div
@@ -150,53 +149,53 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
               >
                 {hasItemsInCart ? (
                   <>
-                    <p className="text-zinc-300 text-sm leading-relaxed">
-                      Congratulations! You've completed your stamp card (Cycle {currentCycle}). A <span className="text-primary font-black">₹100 Cashback Discount</span> is ready. You have products in your cart! Proceed to checkout now to apply your cashback.
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Congratulations! You have completed your credentials (Cycle {currentCycle}). Your <span className="text-primary font-bold">10% Archive Privilege Discount</span> is ready. Checkout now to apply your benefits.
                     </p>
-                    <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-6 rounded-xl shadow-lg active-scale">
+                    <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium h-11 px-6 rounded-button shadow-sm">
                       <Link href="/checkout" className="flex items-center gap-2">
-                        Proceed to Checkout <ArrowRight className="w-4 h-4" />
+                        Checkout with Privilege <ArrowRight className="w-4 h-4" />
                       </Link>
                     </Button>
                   </>
                 ) : (
                   <>
-                    <p className="text-zinc-300 text-sm leading-relaxed">
-                      Congratulations! You've completed your stamp card (Cycle {currentCycle}). A <span className="text-primary font-black">₹100 Cashback Discount</span> has been unlocked and will be applied automatically at checkout on your next shopping trip.
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      Congratulations! You have completed your credentials (Cycle {currentCycle}). Your <span className="text-primary font-bold">10% Archive Privilege Discount</span> has been unlocked and will apply automatically at checkout.
                     </p>
-                    <Button asChild className="bg-primary hover:bg-primary/95 text-white font-bold h-11 px-6 rounded-xl shadow-lg active-scale">
+                    <Button asChild className="bg-primary hover:bg-primary/95 text-primary-foreground font-medium h-11 px-6 rounded-button shadow-sm">
                       <Link href="/shop" className="flex items-center gap-2">
-                        Shop Now to Redeem <ArrowRight className="w-4 h-4" />
+                        Explore Catalog <ArrowRight className="w-4 h-4" />
                       </Link>
                     </Button>
                   </>
                 )}
                 {completedCycles > 0 && (
-                  <div className="text-[10px] text-green-500 font-bold uppercase tracking-widest font-mono pt-1">
-                    🎉 Completed Reward Cycles: {completedCycles} (₹{completedCycles * 100} Cashback claimed)
+                  <div className="text-[10px] text-primary font-mono tracking-wider pt-1 uppercase">
+                    🎉 Completed VIP Cycles: {completedCycles}
                   </div>
                 )}
                 
                 {/* Next Selection Suggestion for Unlocked State */}
                 {recommendedProduct && (
-                  <div className="mt-4 p-3.5 rounded-2xl bg-zinc-900/40 border border-zinc-850 space-y-2.5">
-                    <div className="flex items-center gap-1.5 text-[9px] font-black tracking-widest text-primary uppercase">
+                  <div className="mt-4 p-3.5 rounded-2xl bg-secondary border border-border/40 space-y-2.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-medium tracking-[0.15em] text-primary uppercase">
                       <Sparkles className="w-3 h-3 text-primary animate-pulse" />
-                      <span>Redeem Cashback On This Featured Selection</span>
+                      <span>Suggested Archive Piece</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Link href={`/shop/${recommendedProduct.id}`} className="relative w-12 h-12 rounded-xl overflow-hidden border border-zinc-800 shrink-0 hover:border-primary/50 transition-colors">
+                      <Link href={`/shop/${recommendedProduct.id}`} className="relative w-12 h-12 rounded-xl overflow-hidden border border-border/60 shrink-0 hover:border-primary/50 transition-colors">
                         <img
                           src={recommendedProduct.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop"}
                           alt={recommendedProduct.name}
-                          className="object-cover w-full h-full animate-fade-in"
+                          className="object-cover w-full h-full"
                         />
                       </Link>
                       <div className="flex-grow min-w-0">
                         <Link href={`/shop/${recommendedProduct.id}`}>
-                          <h4 className="text-xs font-black text-white uppercase truncate hover:text-primary transition-colors">{recommendedProduct.name}</h4>
+                          <h4 className="text-xs font-bold text-foreground uppercase truncate hover:text-primary transition-colors">{recommendedProduct.name}</h4>
                         </Link>
-                        <p className="text-[10px] font-mono text-primary font-bold">₹{parseFloat(recommendedProduct.price).toFixed(2)}</p>
+                        <p className="text-[10px] font-mono text-muted-foreground">₹{parseFloat(recommendedProduct.price).toFixed(2)}</p>
                       </div>
                       <Button
                         onClick={(e) => {
@@ -213,9 +212,9 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
                           showToast.success(`Added ${recommendedProduct.name} to cart!`);
                         }}
                         size="sm"
-                        className="bg-zinc-900 border border-zinc-800 hover:bg-primary hover:text-white text-zinc-300 font-bold text-[10px] h-8 rounded-lg px-3 uppercase shrink-0 transition-all duration-300 active-scale"
+                        className="bg-background border border-border/60 hover:bg-primary hover:text-primary-foreground text-foreground font-medium text-[10px] h-8 rounded-button px-4 uppercase shrink-0 transition-all duration-300"
                       >
-                        Add Selection
+                        Add to Order
                       </Button>
                     </div>
                   </div>
@@ -227,44 +226,44 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-4"
               >
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Shop and earn stamps! Each order adds 1 stamp. Collect 7 stamps to unlock <span className="text-primary font-black">₹100 Cashback</span> automatically on your next checkout.
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Support the archive and earn standing. Reach 7 purchase references to unlock your exclusive <span className="text-primary font-bold">10% Elite Member Privilege</span> automatically.
                 </p>
                 {completedCycles > 0 && (
-                  <div className="text-[10px] text-green-500 font-bold uppercase tracking-widest font-mono">
-                    🎉 Completed Reward Cycles: {completedCycles} (₹{completedCycles * 100} Cashback claimed)
+                  <div className="text-[10px] text-primary font-mono tracking-wider uppercase">
+                    🎉 Completed VIP Cycles: {completedCycles}
                   </div>
                 )}
-                <div className="text-xs font-black text-zinc-300 uppercase tracking-widest font-mono">
-                  Cycle {currentCycle} Progress: <span className="text-primary">{stamps} / 7 Stamps</span>
+                <div className="text-[10px] font-medium text-foreground uppercase tracking-[0.15em] font-mono">
+                  Cycle {currentCycle} Standing: <span className="text-primary font-bold">{stamps} / 7 References</span>
                 </div>
-                <div className="w-full h-2 bg-zinc-900 border border-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-secondary border border-border/20 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-primary transition-all duration-500 shadow-glow"
+                    className="h-full bg-primary transition-all duration-500"
                     style={{ width: `${(stamps / totalSlots) * 100}%` }}
                   />
                 </div>
 
                 {/* Next Selection Recommendation Card */}
                 {recommendedProduct && (
-                  <div className="mt-4 p-3.5 rounded-2xl bg-zinc-900/40 border border-zinc-850 space-y-2.5">
-                    <div className="flex items-center gap-1.5 text-[9px] font-black tracking-widest text-primary uppercase">
+                  <div className="mt-4 p-3.5 rounded-2xl bg-secondary border border-border/40 space-y-2.5">
+                    <div className="flex items-center gap-1.5 text-[9px] font-medium tracking-[0.15em] text-primary uppercase">
                       <Sparkles className="w-3 h-3 text-primary" />
-                      <span>Next Suggested Target (Stamp #{stamps + 1})</span>
+                      <span>Next Suggested Reference</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Link href={`/shop/${recommendedProduct.id}`} className="relative w-12 h-12 rounded-xl overflow-hidden border border-zinc-800 shrink-0 hover:border-primary/50 transition-colors">
+                      <Link href={`/shop/${recommendedProduct.id}`} className="relative w-12 h-12 rounded-xl overflow-hidden border border-border/60 shrink-0 hover:border-primary/50 transition-colors">
                         <img
                           src={recommendedProduct.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop"}
                           alt={recommendedProduct.name}
-                          className="object-cover w-full h-full animate-fade-in"
+                          className="object-cover w-full h-full"
                         />
                       </Link>
                       <div className="flex-grow min-w-0">
                         <Link href={`/shop/${recommendedProduct.id}`}>
-                          <h4 className="text-xs font-black text-white uppercase truncate hover:text-primary transition-colors">{recommendedProduct.name}</h4>
+                          <h4 className="text-xs font-bold text-foreground uppercase truncate hover:text-primary transition-colors">{recommendedProduct.name}</h4>
                         </Link>
-                        <p className="text-[10px] font-mono text-primary font-bold">₹{parseFloat(recommendedProduct.price).toFixed(2)}</p>
+                        <p className="text-[10px] font-mono text-muted-foreground">₹{parseFloat(recommendedProduct.price).toFixed(2)}</p>
                       </div>
                       <Button
                         onClick={(e) => {
@@ -281,9 +280,9 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
                           showToast.success(`Added ${recommendedProduct.name} to cart!`);
                         }}
                         size="sm"
-                        className="bg-zinc-900 border border-zinc-800 hover:bg-primary hover:text-white text-zinc-300 font-bold text-[10px] h-8 rounded-lg px-3 uppercase shrink-0 transition-all duration-300 active-scale"
+                        className="bg-background border border-border/60 hover:bg-primary hover:text-primary-foreground text-foreground font-medium text-[10px] h-8 rounded-button px-4 uppercase shrink-0 transition-all duration-300"
                       >
-                        Add Selection
+                        Add to Order
                       </Button>
                     </div>
                   </div>
@@ -291,12 +290,11 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
 
                 {hasItemsInCart && (
                   <div className="pt-2">
-                    <Button asChild className="bg-primary hover:bg-primary/90 text-white font-bold h-11 px-6 rounded-xl shadow-lg active-scale">
+                    <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium h-11 px-6 rounded-button shadow-sm">
                       <Link href="/checkout" className="flex items-center gap-2">
                         Proceed to Checkout <ArrowRight className="w-4 h-4" />
                       </Link>
                     </Button>
-                    <span className="block text-[10px] text-zinc-500 mt-1.5 uppercase font-mono">Checkout now to lock in stamp #{stamps + 1}!</span>
                   </div>
                 )}
               </motion.div>
@@ -304,59 +302,36 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
           </AnimatePresence>
         </div>
 
-        {/* Cyberpunk Loyalty Card Block */}
+        {/* Minimalist Archive Card Block */}
         <div className="w-full md:w-80 shrink-0 relative z-10">
           <div className={cn(
-            "w-full aspect-[1.6/1] rounded-2xl bg-gradient-to-br from-zinc-900/90 via-black/95 to-zinc-950/90 border p-5 flex flex-col justify-between relative overflow-hidden backdrop-blur-md shadow-2xl transition-all duration-500",
+            "w-full aspect-[1.6/1] rounded-2xl bg-secondary border p-6 flex flex-col justify-between relative overflow-hidden shadow-sm transition-all duration-500",
             isRewardReady
-              ? "border-primary/80 shadow-[0_0_30px_rgba(249,115,22,0.25)] animate-pulse"
-              : "border-zinc-800/80 group-hover:border-zinc-700"
+              ? "border-primary/80"
+              : "border-border/60"
           )}>
-
-            {/* Glossy Reflection overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
-
             {/* Top header details */}
             <div className="flex justify-between items-start">
               <div className="flex flex-col">
-                <span className="text-[7px] font-mono text-zinc-500 uppercase tracking-widest">VIP PASS // CYCLE-0{currentCycle}</span>
-                <span className="text-[10px] font-black tracking-widest text-zinc-300 uppercase">{session.user?.name || "FOX MEMBER"}</span>
-              </div>
-
-              {/* Premium SIM chip micro-emulator */}
-              <div className="w-11 h-8 rounded bg-gradient-to-br from-amber-400/25 via-amber-500/15 to-amber-600/20 border border-amber-500/25 relative overflow-hidden flex flex-col justify-between p-1.5 opacity-80 shadow-md">
-                <div className="flex justify-between w-full h-1/4">
-                  <div className="w-1/4 h-full bg-amber-500/15 rounded-sm" />
-                  <div className="w-1/4 h-full bg-amber-500/15 rounded-sm" />
-                </div>
-                <div className="w-full h-px bg-amber-500/20" />
-                <div className="flex justify-between w-full h-1/4">
-                  <div className="w-1/4 h-full bg-amber-500/15 rounded-sm" />
-                  <div className="w-1/4 h-full bg-amber-500/15 rounded-sm" />
-                </div>
+                <span className="text-[7px] font-mono text-muted-foreground uppercase tracking-[0.2em]">VIP PASS // CYCLE 0{currentCycle}</span>
+                <span className="text-xs font-bold tracking-wider text-foreground uppercase mt-1">{session.user?.name || "FOX MEMBER"}</span>
               </div>
             </div>
 
-            {/* Grid list of stamps */}
-            <div className="grid grid-cols-7 gap-1.5 py-4">
+            {/* Premium reference timeline tracker */}
+            <div className="grid grid-cols-7 gap-2 py-4">
               {Array.from({ length: totalSlots }).map((_, i) => {
                 const isStamped = i < stamps;
                 return (
                   <div
                     key={i}
                     className={cn(
-                      "aspect-square rounded-lg border flex items-center justify-center text-[10px] font-black font-mono transition-all duration-500",
+                      "h-1 rounded-full transition-all duration-500",
                       isStamped
-                        ? "bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(249,115,22,0.3)] animate-pulse"
-                        : "bg-black/40 border-zinc-800/80 text-zinc-600 hover:border-zinc-700/60"
+                        ? "bg-primary"
+                        : "bg-muted-foreground/20"
                     )}
-                  >
-                    {isStamped ? (
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    ) : (
-                      <span>0{i + 1}</span>
-                    )}
-                  </div>
+                  />
                 );
               })}
             </div>
@@ -364,20 +339,13 @@ export function LoyaltyCard({ className }: LoyaltyCardProps) {
             {/* Card bottom details */}
             <div className="flex justify-between items-end">
               <div className="flex flex-col">
-                <span className="text-[6px] font-mono text-zinc-600 tracking-wider">LOYALTY SERIAL // CYCLE-{currentCycle}-STAMP-{stamps}</span>
-                <span className="text-[8px] font-black text-primary/80 uppercase tracking-widest flex items-center gap-1">
-                  {isRewardReady ? (
-                    <>
-                      <Sparkles className="w-2.5 h-2.5 animate-spin" />
-                      <span>₹100 Cashback Active</span>
-                    </>
-                  ) : (
-                    <span>Stamp Card Active</span>
-                  )}
+                <span className="text-[6px] font-mono text-muted-foreground/60 tracking-wider">SERIAL // {currentCycle}-{stamps}-VIP</span>
+                <span className="text-[8px] font-bold text-primary uppercase tracking-widest mt-1">
+                  {isRewardReady ? "PRIVILEGE ACTIVE" : "PROGRESSING"}
                 </span>
               </div>
-              <span className="text-[12px] font-bold tracking-tighter text-zinc-500 uppercase">
-                FOX<span className="text-primary font-black">FALCON</span>
+              <span className="font-sans font-black tracking-[0.18em] text-[10px] text-foreground uppercase select-none">
+                FOX <span className="text-primary">FALCON</span>
               </span>
             </div>
 

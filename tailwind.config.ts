@@ -55,9 +55,18 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        button: "10px",
+        card: "16px",
+        banner: "24px",
       },
       boxShadow: {
         glow: "var(--shadow-glow)",
+        premium: "0 8px 30px rgba(31, 26, 19, 0.04)",
+        glowDark: "0 0 25px rgba(255, 106, 0, 0.15)",
+      },
+      fontFamily: {
+        sans: ["Archivo", "Inter", "sans-serif"],
+        serif: ["Relona", "Cormorant Garamond", "serif"],
       },
       keyframes: {
         "accordion-down": {

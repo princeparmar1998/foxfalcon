@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { DeveloperModal } from "./modal-developer";
 
@@ -11,11 +12,16 @@ const Footer = () => {
     <footer className="bg-background border-t border-border py-12 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="space-y-4">
-          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-black rounded-full overflow-hidden border border-border flex items-center justify-center">
-              <img src="/logo-icon.png" alt="Fox Falcon Logo" className="w-full h-full object-cover" />
+          <Link href="/" className="flex flex-col items-start gap-0.5 group">
+            <div className="relative w-11 h-11 transition-transform duration-300 group-hover:scale-105">
+              <Image 
+                src="/logo-icon.png?v=2" 
+                fill 
+                alt="Fox Falcon Logo" 
+                className="object-contain dark:brightness-100 brightness-0 transition-all duration-300" 
+              />
             </div>
-            <span className="font-sans uppercase font-black">
+            <span className="font-sans font-black tracking-[0.18em] text-2xl uppercase text-foreground select-none leading-none mt-1">
               FOX <span className="text-primary">FALCON</span>
             </span>
           </Link>

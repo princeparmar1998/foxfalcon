@@ -63,23 +63,31 @@ const Navbar = () => {
   // Which links to show in navbar
   const activeLinks = isAdmin ? adminNavLinks : isUser ? userNavLinks : [];
 
+  const showTransparent = pathname === "/" && !isScrolled;
+
   return (
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
-        isScrolled
-          ? "bg-background/80 backdrop-blur-md border-b border-border py-3"
-          : "bg-transparent"
+        showTransparent
+          ? "bg-transparent"
+          : "bg-background/80 backdrop-blur-md border-b border-border py-3"
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center gap-3 group">
-          <div className="w-14 h-14 bg-black rounded-full group-hover:scale-110 transition-transform flex items-center justify-center overflow-hidden border border-border relative">
-            <Image src="/logo-icon.png" width={56} height={56} alt="Fox Falcon Logo" className="object-cover" />
+        <Link href="/" className="flex flex-col items-center gap-0 group">
+          <div className="relative w-11 h-11 transition-transform duration-300 group-hover:scale-105">
+            <Image 
+              src="/logo-icon.png?v=2" 
+              fill 
+              alt="Fox Falcon Logo" 
+              className={cn("object-contain transition-all duration-300", showTransparent ? "brightness-100" : "dark:brightness-100 brightness-0")} 
+            />
           </div>
-          <span className="hidden sm:inline-block font-sans uppercase text-3xl font-black">
-            FOX <span className="text-primary">FALCON</span>
+          <span className="font-sans font-black tracking-[0.18em] text-[11px] uppercase select-none text-center leading-none mt-0.5">
+            <span className={cn("transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white")}>FOX </span>
+            <span className="text-primary">FALCON</span>
           </span>
         </Link>
 
@@ -93,7 +101,7 @@ const Navbar = () => {
                 href={link.href}
                 className={cn(
                   "text-sm font-medium hover:text-primary transition-colors relative group flex items-center gap-1.5",
-                  pathname === link.href ? "text-primary" : "text-foreground/80"
+                  pathname === link.href ? "text-primary" : (!showTransparent ? "text-foreground/80" : "text-white/80 hover:text-white")
                 )}
               >
                 {isAdmin && LinkIcon && <LinkIcon className="w-4 h-4" />}
@@ -118,11 +126,11 @@ const Navbar = () => {
         <div className="flex items-center gap-2">
           {session && (
             <>
-              <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <Button variant="ghost" size="icon" className={cn("hidden sm:flex transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white hover:text-white hover:bg-white/10")}>
                 <Search className="w-5 h-5" />
               </Button>
               <Link href="/wishlist">
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className={cn("relative transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white hover:text-white hover:bg-white/10")}>
                   <Heart className="w-5 h-5" />
                   {wishlistCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
@@ -130,7 +138,7 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link href="/cart">
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className={cn("relative transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white hover:text-white hover:bg-white/10")}>
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-black animate-bounce">
@@ -205,7 +213,7 @@ const Navbar = () => {
             </DropdownMenu>
           ) : (
             <Link href="/login">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className={cn("transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white hover:text-white hover:bg-white/10")}>
                 <User className="w-5 h-5" />
               </Button>
             </Link>
@@ -214,7 +222,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden"
+              className={cn("md:hidden transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white hover:text-white hover:bg-white/10")}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
