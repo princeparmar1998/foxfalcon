@@ -60,8 +60,14 @@ const config: Config = {
         banner: "24px",
       },
       boxShadow: {
+        sm: "var(--shadow-sm)",
+        DEFAULT: "var(--shadow-default)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        "2xl": "var(--shadow-2xl)",
         glow: "var(--shadow-glow)",
-        premium: "0 8px 30px rgba(31, 26, 19, 0.04)",
+        premium: "var(--shadow-premium)",
         glowDark: "0 0 25px rgba(255, 106, 0, 0.15)",
       },
       fontFamily: {
