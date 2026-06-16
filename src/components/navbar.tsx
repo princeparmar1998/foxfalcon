@@ -171,7 +171,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Logo & Sub-Branding */}
           <Link href="/" className="flex flex-col items-center gap-0 group shrink-0">
-            <div className="relative w-9 h-9 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative w-14 h-14 transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/logo-icon.png?v=2"
                 fill
@@ -180,7 +180,7 @@ const Navbar = () => {
                 unoptimized
               />
             </div>
-            <span className="font-sans font-black tracking-[0.18em] text-[9px] uppercase select-none text-center leading-none mt-[-3px]">
+            <span className="font-sans font-black tracking-[0.18em] text-[11px] uppercase select-none text-center leading-none mt-[-8px]">
               <span className={cn("transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white")}>FOX </span>
               <span className="text-primary">FALCON</span>
             </span>
