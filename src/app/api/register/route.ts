@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Account successfully created!",
+      message: "Membership successfully created!",
       user: {
         id: newUser.id,
         name: newUser.name,

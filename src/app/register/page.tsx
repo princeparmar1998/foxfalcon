@@ -32,7 +32,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const data = await authApi.register({ name, email, password });
-      toast.success(data.message || "Account successfully created!");
+      toast.success(data.message || "Membership successfully created!");
       router.push("/login");
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || "An unexpected error occurred.";
@@ -50,7 +50,7 @@ export default function RegisterPage() {
           
           <div className="text-center space-y-2 mb-8">
             <h1 className="text-3xl font-black tracking-tighter">JOIN THE CRW</h1>
-            <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">Create a Fox Falcon account</p>
+            <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">Create a Fox Falcon Profile</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -135,7 +135,7 @@ export default function RegisterPage() {
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-8 font-medium">
-            Already have an account? <Link href="/login" className="text-primary font-black hover:underline">Log In</Link>
+            Already a member? <Link href="/login" className="text-primary font-black hover:underline">Log In</Link>
           </p>
         </Card>
       </div>

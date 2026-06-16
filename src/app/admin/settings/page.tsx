@@ -134,10 +134,10 @@ export default function AdminSettingsPage() {
             </div>
           </Card>
 
-          {/* Database Status */}
+          {/* System Engine Status */}
           <Card className="p-6 border-border bg-card">
             <h3 className="font-black flex items-center gap-2 mb-4 text-sm uppercase tracking-wider text-foreground">
-              <Database className="w-4 h-4 text-primary" /> Database
+              <Database className="w-4 h-4 text-primary" /> System Engine
             </h3>
             <div className="space-y-3.5 text-sm">
               <div className="flex justify-between items-center border-b border-border/40 pb-2">

@@ -317,7 +317,7 @@ export default function ProfilePage() {
                 <div className="py-20 text-center space-y-4">
                   <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto" />
                   <p className="text-muted-foreground">
-                    {viewAllOrders ? "No store orders found in the database." : "You haven't placed any orders yet."}
+                    {viewAllOrders ? "No store orders found in the system." : "You haven't placed any orders yet."}
                   </p>
                   {!viewAllOrders && (
                     <Button asChild variant="link" className="text-primary font-bold">
@@ -592,7 +592,7 @@ export default function ProfilePage() {
             {/* Settings Tab */}
             <TabsContent value="settings" className="outline-none">
               <Card className="p-8 border-border">
-                <h3 className="text-lg font-bold mb-6">Account Settings</h3>
+                <h3 className="text-lg font-bold mb-6">Profile Settings</h3>
                 <div className="space-y-4 max-w-md">
                   <div className="space-y-2">
                     <Label>Full Name</Label>
@@ -630,7 +630,7 @@ export default function ProfilePage() {
                     <p className="text-[10px] text-muted-foreground">Email cannot be changed.</p>
                   </div>
                   <div className="space-y-2">
-                    <Label>Account Role</Label>
+                    <Label>Profile Role</Label>
                     <Input defaultValue={(session.user as any)?.role || "USER"} disabled className="bg-muted/50 border-border/80 text-muted-foreground cursor-not-allowed" />
                   </div>
                   <Button
@@ -656,7 +656,7 @@ export default function ProfilePage() {
         <DialogContent className="sm:max-w-[500px] bg-background border-border">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black">ADD ADDRESS</DialogTitle>
-            <DialogDescription>Add a new delivery address to your account.</DialogDescription>
+            <DialogDescription>Add a new delivery address to your profile.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddAddress} className="space-y-4 pt-4">
             <div className="space-y-2">

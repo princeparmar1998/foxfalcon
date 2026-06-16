@@ -601,10 +601,10 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
             </DialogTitle>
             <DialogDescription>
               {editingProduct
-                ? `Modifying ${editingProduct.name} parameters inside Neon PostgreSQL.`
+                ? `Modifying ${editingProduct.name} parameters inside store system.`
                 : dialogTab === "bulk"
-                  ? "Perform rapid database updates by pasting bulk JSON arrays or standard CSV rows."
-                  : "Upload a premium new streetwear garment to the database with detailed metadata."}
+                  ? "Perform rapid catalog updates by pasting bulk JSON arrays or standard CSV rows."
+                  : "Upload a premium new streetwear garment to the catalog with detailed metadata."}
             </DialogDescription>
           </DialogHeader>
 

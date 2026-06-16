@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       where: { deletedAt: null }
     });
     if (!fallbackProduct) {
-      return new NextResponse("Database must contain at least one product to check out", { status: 400 });
+      return new NextResponse("Catalog must contain at least one product to check out", { status: 400 });
     }
 
     // Verify all item productIds exist, otherwise map to fallback

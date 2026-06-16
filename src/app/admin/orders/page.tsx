@@ -117,12 +117,12 @@ export default function AdminOrdersPage() {
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-4 text-muted-foreground">
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
-            <span className="font-bold">Loading orders from Neon Postgres...</span>
+            <span className="font-bold">Loading store orders...</span>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="py-20 text-center space-y-4">
             <Package className="w-16 h-16 text-muted-foreground mx-auto" />
-            <p className="text-muted-foreground font-medium">No orders found in the database.</p>
+            <p className="text-muted-foreground font-medium">No orders found in the system.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

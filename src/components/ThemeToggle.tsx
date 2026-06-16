@@ -17,7 +17,7 @@ export const ThemeToggle = () => {
 
   if (!mounted) {
     return (
-      <div className="w-[104px] h-9 bg-secondary/30 rounded-full border border-border/40 animate-pulse" />
+      <div className="w-[92px] h-8 bg-secondary/30 rounded-full border border-border/40 animate-pulse" />
     );
   }
 
@@ -28,7 +28,7 @@ export const ThemeToggle = () => {
   ];
 
   return (
-    <div className="relative flex items-center bg-secondary/30 border border-border/60 p-0.5 rounded-full w-[108px] h-9 select-none">
+    <div className="relative flex items-center bg-secondary/30 border border-border/60 p-0.5 rounded-full w-[96px] h-8 select-none">
       {options.map((opt) => {
         const Icon = opt.icon;
         const isActive = theme === opt.value;
@@ -39,11 +39,11 @@ export const ThemeToggle = () => {
             onClick={() => setTheme(opt.value)}
             title={`Set theme to ${opt.label}`}
             className={cn(
-              "relative z-10 flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-300",
+              "relative z-10 flex items-center justify-center w-7 h-7 rounded-full transition-colors duration-300",
               isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <Icon className="w-4 h-4 shrink-0" />
+            <Icon className="w-3.5 h-3.5 shrink-0" />
             {isActive && (
               <motion.div
                 layoutId="theme-active-indicator"

@@ -1,19 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Heart, 
   ShoppingBag, 
   ChevronLeft, 
   Star, 
-  ShieldCheck, 
   Truck, 
-  RefreshCcw,
   Plus,
   Minus,
   Loader2,
-  Ruler
+  Ruler,
+  MapPin,
+  CheckCircle2,
+  XCircle,
+  Flame,
+  Eye,
+  Clock,
+  BadgeCheck,
+  Package,
+  RotateCcw,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,13 +45,42 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [galleryHovered, setGalleryHovered] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const addToCartRef = useRef<HTMLDivElement>(null);
+
+  // Pincode Checker
+  const [pincode, setPincode] = useState("");
+  const [pincodeResult, setPincodeResult] = useState<null | { available: boolean; deliveryDate: string; freeShipping: boolean; cod: boolean }>(null);
+  const [checkingPincode, setCheckingPincode] = useState(false);
+
+  // Scarcity indicators (simulated)
+  const [scarcityData] = useState(() => ({
+    stockLeft: Math.floor(Math.random() * 8) + 2,  // 2-9
+    viewersNow: Math.floor(Math.random() * 30) + 10, // 10-39
+    sellingFast: Math.random() > 0.4,
+  }));
 
   const { data: session } = useSession();
   const [reviews, setReviews] = useState<any[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+
+  useEffect(() => {
+    async function fetchRecommendations() {
+      try {
+        const data = await productsApi.getAll();
+        setRecommendations(data);
+      } catch (err) {
+        console.error("Could not fetch recommendations:", err);
+      }
+    }
+    fetchRecommendations();
+  }, []);
 
   const [ratingInput, setRatingInput] = useState(5);
   const [commentInput, setCommentInput] = useState("");
@@ -117,6 +154,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         if (data.sizes && data.sizes.length > 0) {
           setSelectedSize(data.sizes[0]);
         }
+        if (data.colors && data.colors.length > 0) {
+          setSelectedColor(data.colors[0]);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -127,14 +167,75 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     fetchReviews();
   }, [params.id]);
 
+  useEffect(() => {
+    if (product && product.colors && product.colors.length > 0 && selectedColor) {
+      const idx = product.colors.indexOf(selectedColor);
+      const productImages = product.images || [];
+      if (idx !== -1 && idx < productImages.length) {
+        setSelectedImage(idx);
+      }
+    }
+  }, [selectedColor, product]);
+
+  // Scroll detection for sticky bar
+  useEffect(() => {
+    const handleScroll = () => {
+      if (addToCartRef.current) {
+        const rect = addToCartRef.current.getBoundingClientRect();
+        setShowStickyBar(rect.bottom < 0);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handlePincodeCheck = () => {
+    if (pincode.length !== 6 || !/^\d{6}$/.test(pincode)) {
+      showToast.error("Please enter a valid 6-digit pincode");
+      return;
+    }
+    setCheckingPincode(true);
+    setPincodeResult(null);
+    // Simulate pincode check
+    setTimeout(() => {
+      const firstDigit = parseInt(pincode[0]);
+      const available = firstDigit >= 1 && firstDigit <= 8;
+      const today = new Date();
+      const deliveryDays = available ? (firstDigit <= 4 ? 2 : 4) : 0;
+      today.setDate(today.getDate() + deliveryDays);
+      const options: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short" };
+      setPincodeResult({
+        available,
+        deliveryDate: available ? today.toLocaleDateString("en-IN", options) : "",
+        freeShipping: available && firstDigit <= 4,
+        cod: available,
+      });
+      setCheckingPincode(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (galleryHovered || !product || !product.images || product.images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setSelectedImage((prev) => (prev + 1) % product.images.length);
+    }, 4000); // cycle every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [galleryHovered, product]);
+
   const isAddedToCart = cart.items.some(
-    (item) => product && item.id === product.id && item.size === selectedSize
+    (item) => product && item.id === product.id && item.size === selectedSize && item.color === selectedColor
   );
 
   const handleAddToCart = () => {
     if (!product) return;
     if (!selectedSize && product.sizes && product.sizes.length > 0) {
       showToast.error("Please select a size first");
+      return;
+    }
+    if (!selectedColor && product.colors && product.colors.length > 0) {
+      showToast.error("Please select a color first");
       return;
     }
 
@@ -150,7 +251,34 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       image: product.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
       quantity: quantity,
       size: selectedSize || undefined,
+      color: selectedColor || undefined,
     });
+  };
+
+  const handleBuyNow = () => {
+    if (!product) return;
+    if (!selectedSize && product.sizes && product.sizes.length > 0) {
+      showToast.error("Please select a size first");
+      return;
+    }
+    if (!selectedColor && product.colors && product.colors.length > 0) {
+      showToast.error("Please select a color first");
+      return;
+    }
+
+    if (!isAddedToCart) {
+      cart.addItem({
+        id: product.id,
+        name: product.name,
+        price: parseFloat(product.price),
+        image: product.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
+        quantity: quantity,
+        size: selectedSize || undefined,
+        color: selectedColor || undefined,
+      });
+    }
+
+    window.location.href = "/checkout";
   };
 
   if (loading) {
@@ -195,7 +323,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative aspect-square rounded-3xl overflow-hidden bg-muted border border-border"
+            onMouseEnter={() => setGalleryHovered(true)}
+            onMouseLeave={() => setGalleryHovered(false)}
+            className="relative aspect-square rounded-3xl overflow-hidden bg-muted border border-border cursor-pointer"
           >
             <Image 
               src={images[selectedImage]} 
@@ -248,6 +378,28 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             {product.description}
           </p>
 
+          {/* Scarcity & Social Proof */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3 flex-wrap">
+              {scarcityData.stockLeft <= 5 && (
+                <div className="flex items-center gap-1.5 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-1.5 text-red-500">
+                  <Package className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-black uppercase tracking-wider">Only {scarcityData.stockLeft} left!</span>
+                </div>
+              )}
+              {scarcityData.sellingFast && (
+                <div className="flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/30 rounded-lg px-3 py-1.5 text-orange-500">
+                  <Flame className="w-3.5 h-3.5" />
+                  <span className="text-[11px] font-black uppercase tracking-wider">Selling Fast</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 bg-muted/50 border border-border/60 rounded-lg px-3 py-1.5 text-muted-foreground">
+                <Eye className="w-3.5 h-3.5" />
+                <span className="text-[11px] font-bold">{scarcityData.viewersNow} people viewing this</span>
+              </div>
+            </div>
+          </div>
+
           <Separator className="bg-border" />
 
           {/* Size Selection */}
@@ -281,79 +433,198 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </div>
           )}
 
-          {/* Quantity & Actions */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex items-center border border-border rounded-xl h-14 bg-muted/20">
-              <button 
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-4 hover:text-primary transition-colors active-scale"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="w-8 text-center font-bold font-mono">{quantity}</span>
-              <button 
-                onClick={() => setQuantity(quantity + 1)}
-                className="px-4 hover:text-primary transition-colors active-scale"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+          {/* Color Selection */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                  Select Color: <span className="text-primary lowercase first-letter:uppercase">{selectedColor}</span>
+                </label>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {product.colors.map((color: string) => {
+                  const isSelected = selectedColor === color;
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={cn(
+                        "w-9 h-9 rounded-full border-2 transition-all active-scale flex items-center justify-center relative shadow-sm hover:scale-105",
+                        isSelected ? "border-primary scale-110 ring-2 ring-primary/25" : "border-border/60"
+                      )}
+                      title={color}
+                    >
+                      <span
+                        className="w-7 h-7 rounded-full border border-black/10"
+                        style={{ backgroundColor: color.toLowerCase() }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            {isAddedToCart ? (
-              <Button 
-                asChild
-                className="flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale bg-green-600 hover:bg-green-700 text-white"
-              >
-                <Link href="/cart" className="flex items-center justify-center">
-                  <ShoppingBag className="w-5 h-5 mr-2" /> View in Cart
-                </Link>
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleAddToCart}
-                className="flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale bg-primary hover:bg-primary/95 text-primary-foreground"
-              >
-                <ShoppingBag className="w-5 h-5 mr-2 group-hover:animate-bounce" /> Add to Cart
-              </Button>
-            )}
-            <Button 
-              size="icon" 
-              variant="outline" 
-              onClick={() => wishlist.toggleItem({
-                id: product.id,
-                name: product.name,
-                price: parseFloat(product.price),
-                image: images[0]
-              })}
-              className={cn(
-                "h-14 w-14 rounded-xl border-2 transition-colors active-scale",
-                wishlist.isInWishlist(product.id) ? "border-red-500 text-red-500 bg-red-500/10 hover:bg-red-500/20" : "border-border"
+          )}
+
+          {/* Quantity & Actions */}
+          <div ref={addToCartRef} className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex items-center border border-border rounded-xl h-14 bg-muted/20">
+                <button 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="px-4 hover:text-primary transition-colors active-scale"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-8 text-center font-bold font-mono">{quantity}</span>
+                <button 
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="px-4 hover:text-primary transition-colors active-scale"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              {isAddedToCart ? (
+                <Button 
+                  asChild
+                  className="flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Link href="/cart" className="flex items-center justify-center">
+                    <ShoppingBag className="w-5 h-5 mr-2" /> View in Cart
+                  </Link>
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleAddToCart}
+                  className="flex-1 h-14 text-sm font-black uppercase tracking-wider group transition-all duration-300 rounded-xl active-scale bg-primary hover:bg-primary/95 text-primary-foreground"
+                >
+                  <ShoppingBag className="w-5 h-5 mr-2 group-hover:animate-bounce" /> Add to Bag
+                </Button>
               )}
+              <Button 
+                size="icon" 
+                variant="outline" 
+                onClick={() => wishlist.toggleItem({
+                  id: product.id,
+                  name: product.name,
+                  price: parseFloat(product.price),
+                  image: images[0]
+                })}
+                className={cn(
+                  "h-14 w-14 rounded-xl border-2 transition-colors active-scale",
+                  wishlist.isInWishlist(product.id) ? "border-red-500 text-red-500 bg-red-500/10 hover:bg-red-500/20" : "border-border"
+                )}
+              >
+                <Heart className={cn("w-5 h-5", wishlist.isInWishlist(product.id) ? "fill-red-500 text-red-500" : "")} />
+              </Button>
+            </div>
+            
+            <Button 
+              onClick={handleBuyNow}
+              className="w-full h-14 text-sm font-black uppercase tracking-wider transition-all duration-300 rounded-xl active-scale bg-black hover:bg-black/90 dark:bg-white dark:hover:bg-white/90 dark:text-black text-white shadow-xl hover:shadow-2xl border border-black/10 dark:border-white/10"
             >
-              <Heart className={cn("w-5 h-5", wishlist.isInWishlist(product.id) ? "fill-red-500 text-red-500" : "")} />
+              Buy Now (Express Checkout)
             </Button>
           </div>
 
-          {/* Shipping Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-border/80">
-            <div className="flex items-center gap-3">
-              <Truck className="w-5 h-5 text-primary" />
-              <div className="space-y-0.5">
-                <p className="text-xs font-black uppercase tracking-wider text-foreground">Free Shipping</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold">On orders over ₹100</p>
+          {/* Pincode Delivery Checker */}
+          <div className="rounded-2xl border border-border/70 bg-muted/10 p-5 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <MapPin className="w-4 h-4 text-primary" />
+              <span className="text-xs font-black uppercase tracking-widest text-foreground">Delivery & COD Checker</span>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={pincode}
+                onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                onKeyDown={(e) => e.key === "Enter" && handlePincodeCheck()}
+                placeholder="Enter 6-digit pincode"
+                className="flex-1 h-10 rounded-xl border border-border bg-background px-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all font-mono tracking-wider"
+                maxLength={6}
+              />
+              <Button
+                onClick={handlePincodeCheck}
+                disabled={checkingPincode || pincode.length !== 6}
+                className="h-10 px-4 text-xs font-black uppercase tracking-wider bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
+              >
+                {checkingPincode ? <Loader2 className="w-4 h-4 animate-spin" /> : "Check"}
+              </Button>
+            </div>
+            <AnimatePresence>
+              {pincodeResult && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className={cn(
+                    "rounded-xl p-3 space-y-2 border",
+                    pincodeResult.available 
+                      ? "bg-green-500/5 border-green-500/20" 
+                      : "bg-red-500/5 border-red-500/20"
+                  )}
+                >
+                  {pincodeResult.available ? (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                        <div>
+                          <p className="text-xs font-black text-green-600 dark:text-green-400">Delivery Available</p>
+                          <p className="text-[11px] text-muted-foreground font-semibold flex items-center gap-1">
+                            <Clock className="w-3 h-3" /> Est. Delivery by <span className="font-black text-foreground">{pincodeResult.deliveryDate}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        {pincodeResult.freeShipping && (
+                          <span className="flex items-center gap-1 text-[10px] font-black bg-green-500/10 text-green-600 dark:text-green-400 rounded-lg px-2 py-1 uppercase tracking-wider">
+                            <Truck className="w-3 h-3" /> Free Shipping
+                          </span>
+                        )}
+                        {pincodeResult.cod && (
+                          <span className="flex items-center gap-1 text-[10px] font-black bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg px-2 py-1 uppercase tracking-wider">
+                            <CheckCircle2 className="w-3 h-3" /> COD Available
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <XCircle className="w-4 h-4 text-red-500 shrink-0" />
+                      <p className="text-xs font-black text-red-500">Delivery not available for this pincode</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Premium Trust Badges */}
+          <div className="grid grid-cols-3 gap-3 pt-2">
+            <div className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-muted/10 p-4 text-center hover:border-primary/30 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <RotateCcw className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-foreground">7-Day Exchange</p>
+                <p className="text-[9px] text-muted-foreground font-semibold">Easy & Hassle-free</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <RefreshCcw className="w-5 h-5 text-primary" />
-              <div className="space-y-0.5">
-                <p className="text-xs font-black uppercase tracking-wider text-foreground">30 Days Return</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold">No questions asked</p>
+            <div className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-muted/10 p-4 text-center hover:border-primary/30 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Truck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-foreground">Free Delivery</p>
+                <p className="text-[9px] text-muted-foreground font-semibold">On orders ₹999+</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 text-primary" />
-              <div className="space-y-0.5">
-                <p className="text-xs font-black uppercase tracking-wider text-foreground">Secure Payment</p>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold font-mono">100% SECURE</p>
+            <div className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-muted/10 p-4 text-center hover:border-primary/30 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Lock className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-wider text-foreground">100% Secure</p>
+                <p className="text-[9px] text-muted-foreground font-semibold">Encrypted checkout</p>
               </div>
             </div>
           </div>
@@ -491,30 +762,41 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     {reviews.map((review) => (
                       <Card key={review.id} className="p-6 border-border bg-card/10 hover:border-primary/20 transition-all relative group">
                         <div className="flex justify-between items-start mb-3">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-sm uppercase tracking-tight">{review.user?.name || "Customer"}</span>
-                              {review.userId === session?.user?.id && (
-                                <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5">My Review</Badge>
-                              )}
-                            </div>
-                            <div className="flex gap-0.5">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star 
-                                  key={star} 
-                                  className={cn(
-                                    "w-3.5 h-3.5",
-                                    star <= review.rating ? "fill-primary text-primary" : "text-muted-foreground"
-                                  )} 
-                                />
-                              ))}
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary text-xs shrink-0">
+                                {(review.user?.name || "C")[0].toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-black text-sm uppercase tracking-tight">{review.user?.name || "Customer"}</span>
+                                  <span className="flex items-center gap-0.5 bg-green-500/10 border border-green-500/20 rounded-md px-1.5 py-0.5">
+                                    <BadgeCheck className="w-3 h-3 text-green-500" />
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-green-600 dark:text-green-400">Verified Buyer</span>
+                                  </span>
+                                  {review.userId === session?.user?.id && (
+                                    <Badge className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5">My Review</Badge>
+                                  )}
+                                </div>
+                                <div className="flex gap-0.5 mt-0.5">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star 
+                                      key={star} 
+                                      className={cn(
+                                        "w-3.5 h-3.5",
+                                        star <= review.rating ? "fill-primary text-primary" : "text-muted-foreground"
+                                      )} 
+                                    />
+                                  ))}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          <span className="text-[10px] text-muted-foreground font-semibold font-mono">
+                          <span className="text-[10px] text-muted-foreground font-semibold font-mono shrink-0">
                             {new Date(review.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                           </span>
                         </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap pl-10">
                           {review.comment}
                         </p>
                       </Card>
@@ -634,6 +916,134 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Similar Items & Cross-Selling Recommendations */}
+      {product && recommendations.filter((p) => p.categoryId === product.categoryId && p.id !== product.id && !p.name?.startsWith("[DELETED]")).length > 0 && (
+        <div className="mt-24 border-t border-border/40 pt-16">
+          <div className="flex flex-col mb-8">
+            <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-1">Complete your look</span>
+            <h2 className="text-2xl font-black uppercase tracking-tighter">Similar Items</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {recommendations
+              .filter((p) => p.categoryId === product.categoryId && p.id !== product.id && !p.name?.startsWith("[DELETED]"))
+              .slice(0, 4)
+              .map((item: any) => {
+                const itemImg = item.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop";
+                return (
+                  <Card key={item.id} className="group relative overflow-hidden bg-card border border-border/40 hover:border-primary/50 transition-all duration-300 rounded-2xl flex flex-col p-0 shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                    <Link href={`/shop/${item.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-muted">
+                      <Image
+                        src={itemImg}
+                        alt={item.name}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-103"
+                        unoptimized
+                      />
+                    </Link>
+                    <div className="p-4 space-y-1">
+                      <Link href={`/shop/${item.id}`} className="block text-xs md:text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors truncate">
+                        {item.name}
+                      </Link>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                          {item.category?.name || "Clothing"}
+                        </span>
+                        <span className="text-xs md:text-sm font-black text-primary font-mono">₹{parseFloat(item.price).toFixed(0)}</span>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {product && recommendations.filter((p) => p.id !== product.id && p.categoryId !== product.categoryId && !p.name?.startsWith("[DELETED]")).length > 0 && (
+        <div className="mt-20 border-t border-border/40 pt-16">
+          <div className="flex flex-col mb-8">
+            <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-1">Others are checking</span>
+            <h2 className="text-2xl font-black uppercase tracking-tighter">Customers Also Bought</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {recommendations
+              .filter((p) => p.id !== product.id && p.categoryId !== product.categoryId && !p.name?.startsWith("[DELETED]"))
+              .slice(0, 4)
+              .map((item: any) => {
+                const itemImg = item.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop";
+                return (
+                  <Card key={item.id} className="group relative overflow-hidden bg-card border border-border/40 hover:border-primary/50 transition-all duration-300 rounded-2xl flex flex-col p-0 shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                    <Link href={`/shop/${item.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-muted">
+                      <Image
+                        src={itemImg}
+                        alt={item.name}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-103"
+                        unoptimized
+                      />
+                    </Link>
+                    <div className="p-4 space-y-1">
+                      <Link href={`/shop/${item.id}`} className="block text-xs md:text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors truncate">
+                        {item.name}
+                      </Link>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                          {item.category?.name || "Clothing"}
+                        </span>
+                        <span className="text-xs md:text-sm font-black text-primary font-mono">₹{parseFloat(item.price).toFixed(0)}</span>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Sticky Add to Cart Bar */}
+      <AnimatePresence>
+        {showStickyBar && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+          >
+            <div className="bg-background/95 backdrop-blur-xl border-t border-border shadow-2xl px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-black uppercase tracking-tight truncate">{product?.name}</p>
+                  <p className="text-sm font-black text-primary font-mono">₹{product ? parseFloat(product.price).toFixed(0) : ""}</p>
+                </div>
+                <div className="flex gap-2">
+                  {isAddedToCart ? (
+                    <Button
+                      asChild
+                      className="h-11 px-5 text-xs font-black uppercase tracking-wider rounded-xl bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Link href="/cart">View Cart</Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleAddToCart}
+                      className="h-11 px-5 text-xs font-black uppercase tracking-wider rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground"
+                    >
+                      <ShoppingBag className="w-4 h-4 mr-1.5" /> Add to Bag
+                    </Button>
+                  )}
+                  <Button
+                    onClick={handleBuyNow}
+                    className="h-11 px-4 text-xs font-black uppercase tracking-wider rounded-xl bg-black hover:bg-black/90 dark:bg-white dark:text-black text-white"
+                  >
+                    Buy Now
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

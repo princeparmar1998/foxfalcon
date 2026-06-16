@@ -160,7 +160,7 @@ export default function AdminReviewsPage() {
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-4 text-muted-foreground">
             <Loader2 className="w-10 h-10 animate-spin text-primary" />
-            <span className="font-bold">Fetching reviews database...</span>
+            <span className="font-bold">Fetching customer reviews...</span>
           </div>
         ) : filteredReviews.length === 0 ? (
           <div className="py-20 text-center space-y-4">
