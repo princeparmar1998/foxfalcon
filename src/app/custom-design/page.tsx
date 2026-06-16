@@ -172,7 +172,7 @@ export default function CustomDesignPage() {
           <Card className="p-6 space-y-6 bg-card border-border rounded-2xl">
             {/* Color selector */}
             <div className="space-y-3">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">1. Select Garment Color</label>
+              <label className="text-xs font-sans font-black uppercase tracking-widest text-muted-foreground">1. Select Garment Color</label>
               <div className="flex gap-3">
                 {colors.map((color) => {
                   const isActive = tshirtColor === color.name;
@@ -201,7 +201,7 @@ export default function CustomDesignPage() {
 
             {/* Size Selector */}
             <div className="space-y-3">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">2. Select Garment Fit</label>
+              <label className="text-xs font-sans font-black uppercase tracking-widest text-muted-foreground">2. Select Garment Fit</label>
               <div className="flex gap-2">
                 {["S", "M", "L", "XL", "XXL"].map((size) => (
                   <button
@@ -222,7 +222,7 @@ export default function CustomDesignPage() {
 
             {/* Design Uploader */}
             <div className="space-y-3">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">3. Upload Transparency Artwork</label>
+              <label className="text-xs font-sans font-black uppercase tracking-widest text-muted-foreground">3. Upload Transparency Artwork</label>
               <input 
                 type="file" 
                 ref={fileInputRef}
@@ -270,7 +270,7 @@ export default function CustomDesignPage() {
 
           {/* Specifications */}
           <div className="space-y-4">
-            <h4 className="text-xs font-black uppercase tracking-widest text-foreground">Creator Studio Specifications</h4>
+            <h4 className="text-xs font-sans font-black uppercase tracking-widest text-foreground">Creator Studio Specifications</h4>
             <ul className="space-y-2 text-xs text-muted-foreground font-medium uppercase tracking-wide">
               <li className="flex items-center gap-2">
                 <RefreshCw className="w-3.5 h-3.5 text-primary shrink-0" />

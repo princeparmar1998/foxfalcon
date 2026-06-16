@@ -15,25 +15,41 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Check if product has any order items
+    const existingProduct = await db.product.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!existingProduct) {
+      return new NextResponse("Product not found", { status: 404 });
+    }
+
+    // If active (not soft deleted yet), perform soft delete
+    const isTrashed = existingProduct.deletedAt !== null || existingProduct.name.startsWith("[DELETED]");
+    if (!isTrashed) {
+      const product = await db.product.update({
+        where: { id: params.id },
+        data: { 
+          deletedAt: new Date(),
+          isFeatured: false 
+        },
+      });
+      return NextResponse.json({ ...product, softDeleted: true });
+    }
+
+    // If already soft-deleted, perform permanent hard delete
     const orderItemCount = await db.orderItem.count({
       where: { productId: params.id },
     });
 
     if (orderItemCount > 0) {
-      // Soft delete: set inventory 0, unfeature - can't hard delete due to FK constraints
-      const product = await db.product.update({
-        where: { id: params.id },
-        data: { inventory: 0, isFeatured: false, name: `[DELETED] ${(await db.product.findUnique({ where: { id: params.id }, select: { name: true } }))?.name}` },
-      });
-      return NextResponse.json({ ...product, softDeleted: true });
+      return new NextResponse("Cannot permanently delete product with existing orders", { status: 400 });
     }
 
     const product = await db.product.delete({
       where: { id: params.id },
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json({ ...product, hardDeleted: true });
   } catch (error) {
     console.error("[PRODUCT_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });

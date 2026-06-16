@@ -12,7 +12,9 @@ import {
   HelpCircle,
   Edit,
   FileSpreadsheet,
-  DownloadCloud
+  DownloadCloud,
+  RotateCcw,
+  Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +50,7 @@ export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<"active" | "trash">("active");
 
   // Edit states
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -112,10 +115,10 @@ export default function AdminProductsPage() {
   };
 
   // Fetch products
-  const fetchProducts = async () => {
+  const fetchProducts = async (tab = activeTab) => {
     try {
       setLoading(true);
-      const data = await adminApi.getProducts();
+      const data = await adminApi.getProducts(tab === "trash");
       setProducts(data);
     } catch (err) {
       showToast.error("Failed to load products", err);
@@ -125,8 +128,8 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(activeTab);
+  }, [activeTab]);
 
   const handleResetForm = () => {
     setEditingProduct(null);
@@ -200,14 +203,30 @@ export default function AdminProductsPage() {
 
   // Handle delete
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+    const isTrash = activeTab === "trash";
+    const msg = isTrash 
+      ? "Are you sure you want to PERMANENTLY delete this product? This action cannot be undone."
+      : "Are you sure you want to move this product to the trash?";
+
+    if (!confirm(msg)) return;
 
     try {
       await adminApi.deleteProduct(id);
-      showToast.success("Product deleted successfully");
+      showToast.success(isTrash ? "Product permanently deleted" : "Product moved to trash");
+      fetchProducts();
+    } catch (err: any) {
+      showToast.error(err.response?.data || "Failed to delete product", err);
+    }
+  };
+
+  // Handle restore
+  const handleRestore = async (id: string) => {
+    try {
+      await adminApi.restoreProduct(id);
+      showToast.success("Product restored successfully");
       fetchProducts();
     } catch (err) {
-      showToast.error("Failed to delete product", err);
+      showToast.error("Failed to restore product", err);
     }
   };
 
@@ -383,8 +402,34 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
       </div>
 
       <Card className="p-6 border-border bg-card">
-        <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
-          <div className="relative flex-1 max-w-md">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+          {/* Active vs Trash Tabs */}
+          <div className="flex gap-2 p-1 bg-muted/50 rounded-xl border border-border">
+            <button
+              onClick={() => setActiveTab("active")}
+              className={cn(
+                "px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all flex items-center gap-2",
+                activeTab === "active"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Package className="w-3.5 h-3.5" /> Active Catalog
+            </button>
+            <button
+              onClick={() => setActiveTab("trash")}
+              className={cn(
+                "px-4 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all flex items-center gap-2",
+                activeTab === "trash"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Archive className="w-3.5 h-3.5" /> Trash Bin
+            </button>
+          </div>
+
+          <div className="relative flex-1 max-w-md w-full md:w-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search products..."
@@ -402,19 +447,29 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="py-20 text-center space-y-4">
-            <Package className="w-16 h-16 text-muted-foreground mx-auto" />
-            <p className="text-muted-foreground font-medium">No products found. Start by uploading one!</p>
-            <Button
-              onClick={() => {
-                handleResetForm();
-                setDialogTab("single");
-                setIsOpen(true);
-              }}
-              variant="outline"
-              className="border-2 font-bold"
-            >
-              Add First Product
-            </Button>
+            {activeTab === "trash" ? (
+              <Archive className="w-16 h-16 text-muted-foreground mx-auto" />
+            ) : (
+              <Package className="w-16 h-16 text-muted-foreground mx-auto" />
+            )}
+            <p className="text-muted-foreground font-medium">
+              {activeTab === "trash"
+                ? (search ? "No trashed products match your search." : "Trash bin is empty.")
+                : (search ? "No active products match your search." : "No products found. Start by uploading one!")}
+            </p>
+            {activeTab !== "trash" && !search && (
+              <Button
+                onClick={() => {
+                  handleResetForm();
+                  setDialogTab("single");
+                  setIsOpen(true);
+                }}
+                variant="outline"
+                className="border-2 font-bold"
+              >
+                Add First Product
+              </Button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -449,6 +504,9 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                           {product.isFeatured && (
                             <Badge className="bg-primary/10 text-primary border-none text-[8px] uppercase tracking-wider font-black px-1.5 py-0.5">Featured</Badge>
                           )}
+                          {product.deletedAt && (
+                            <Badge variant="destructive" className="border-none text-[8px] uppercase tracking-wider font-black px-1.5 py-0.5">Trashed</Badge>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -475,21 +533,43 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                             <Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => window.open(`/shop/${product.id}`, "_blank")}
-                              className="font-bold cursor-pointer"
-                            >
-                              <ExternalLink className="w-4 h-4 mr-2" /> View Live
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleStartEdit(product)}
-                              className="font-bold cursor-pointer"
-                            >
-                              <Edit className="w-4 h-4 mr-2 text-primary" /> Edit Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDelete(product.id)} className="font-bold text-destructive cursor-pointer">
-                              <Trash2 className="w-4 h-4 mr-2" /> Delete
-                            </DropdownMenuItem>
+                            {activeTab === "trash" ? (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() => handleRestore(product.id)}
+                                  className="font-bold cursor-pointer"
+                                >
+                                  <RotateCcw className="w-4 h-4 mr-2 text-primary" /> Restore Product
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDelete(product.id)}
+                                  className="font-bold text-destructive cursor-pointer"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" /> Permanent Delete
+                                </DropdownMenuItem>
+                              </>
+                            ) : (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() => window.open(`/shop/${product.id}`, "_blank")}
+                                  className="font-bold cursor-pointer"
+                                >
+                                  <ExternalLink className="w-4 h-4 mr-2" /> View Live
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleStartEdit(product)}
+                                  className="font-bold cursor-pointer"
+                                >
+                                  <Edit className="w-4 h-4 mr-2 text-primary" /> Edit Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDelete(product.id)}
+                                  className="font-bold text-destructive cursor-pointer"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" /> Move to Trash
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

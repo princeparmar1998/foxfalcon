@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, Search, ChevronDown, Heart, ShoppingBag, Loader2, Package } from "lucide-react";
+import { Search, ChevronDown, Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,8 +15,6 @@ import {
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/hooks/use-cart";
-import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
 import { showToast } from "@/lib/toast";
 import { productsApi } from "@/lib/api";
@@ -34,8 +32,12 @@ export default function ShopPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
-  const { addItem } = useCart();
-  const wishlist = useWishlist();
+  const [visibleCount, setVisibleCount] = useState(30);
+
+  // Reset pagination on filter or sort change
+  useEffect(() => {
+    setVisibleCount(30);
+  }, [selectedCategory, searchQuery, sortBy]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -78,20 +80,6 @@ export default function ShopPage() {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-  const handleQuickAddToCart = (e: React.MouseEvent, product: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: parseFloat(product.price),
-      image: product.images?.[0] || "",
-      size: product.sizes?.[0] || "M",
-      color: product.colors?.[0] || "",
-      quantity: 1,
-    });
-    showToast.success(`${product.name} added to cart!`);
-  };
 
   return (
     <div className="container px-6 mx-auto pt-32 pb-20 bg-background text-foreground">
@@ -170,95 +158,81 @@ export default function ShopPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map((product) => {
-              const imageSrc = product.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop";
-              const isNew = new Date(product.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000;
-              const isOutOfStock = product.inventory <= 0;
+        <div className="space-y-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <AnimatePresence mode="popLayout">
+              {filteredProducts.slice(0, visibleCount).map((product) => {
+                const imageSrc = product.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop";
+                const isNew = new Date(product.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000;
+                const isOutOfStock = product.inventory <= 0;
 
-              return (
-                <motion.div
-                  layout
-                  key={product.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Card className="group relative overflow-hidden bg-card border border-border hover:border-primary/60 transition-all duration-300 p-3 pb-4 rounded-2xl flex flex-col gap-0 shadow-md hover:shadow-lg dark:shadow-black/40 ring-0">
-                    <Link href={`/shop/${product.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-xl border border-border/40 bg-muted">
-                      <Image
-                        src={imageSrc}
-                        alt={product.name}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        unoptimized
-                      />
-                      {isNew && !isOutOfStock && (
-                        <Badge className="absolute top-3 left-3 bg-secondary text-secondary-foreground font-black px-2.5 py-0.5 uppercase tracking-widest text-[9px]">
-                          New
-                        </Badge>
-                      )}
-                      {isOutOfStock && (
-                        <Badge className="absolute top-3 left-3 bg-red-500/90 text-white font-black px-2.5 py-0.5 uppercase tracking-widest text-[9px]">
-                          Sold Out
-                        </Badge>
-                      )}
-                      {product.isFeatured && !isOutOfStock && !isNew && (
-                        <Badge className="absolute top-3 left-3 bg-primary/90 text-primary-foreground font-black px-2.5 py-0.5 uppercase tracking-widest text-[9px]">
-                          Featured
-                        </Badge>
-                      )}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
-                        <Button
-                          size="icon"
-                          variant="secondary"
-                          className={cn(
-                            "rounded-full w-10 h-10 shadow-xl hover:scale-110 transition-transform",
-                            wishlist.isInWishlist(product.id) ? "bg-red-500 text-white hover:bg-red-600 border-none" : ""
-                          )}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            wishlist.toggleItem({
-                              id: product.id,
-                              name: product.name,
-                              price: parseFloat(product.price),
-                              image: imageSrc
-                            });
-                          }}
-                        >
-                          <Heart className={cn("w-4.5 h-4.5", wishlist.isInWishlist(product.id) ? "fill-white text-white" : "")} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          className="rounded-full w-10 h-10 shadow-xl hover:scale-110 transition-transform bg-primary"
-                          disabled={isOutOfStock}
-                        >
-                          <ShoppingBag className="w-4.5 h-4.5 text-primary-foreground" />
-                        </Button>
-                      </div>
-                    </Link>
+                return (
+                  <motion.div
+                    layout
+                    key={product.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card className="group relative overflow-hidden bg-card border border-border/40 hover:border-primary/50 transition-all duration-500 rounded-2xl flex flex-col gap-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 active-scale-98 pt-0 pb-0">
+                      <Link href={`/shop/${product.id}`} className="block relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-muted">
+                        <Image
+                          src={imageSrc}
+                          alt={product.name}
+                          fill
+                          className="object-cover transition-transform duration-1000 ease-out group-hover:scale-103"
+                          unoptimized
+                        />
+                        {isNew && !isOutOfStock && (
+                          <Badge className="absolute top-3 left-3 bg-secondary text-secondary-foreground font-black px-2 py-0.5 uppercase tracking-widest text-[8px] border-none shadow-sm">
+                            New
+                          </Badge>
+                        )}
+                        {isOutOfStock && (
+                          <Badge className="absolute top-3 left-3 bg-red-500/90 text-white font-black px-2 py-0.5 uppercase tracking-widest text-[8px] border-none shadow-sm">
+                            Sold Out
+                          </Badge>
+                        )}
+                        {product.isFeatured && !isOutOfStock && !isNew && (
+                          <Badge className="absolute top-3 left-3 bg-primary/95 text-primary-foreground font-black px-2 py-0.5 uppercase tracking-widest text-[8px] border-none shadow-sm">
+                            Featured
+                          </Badge>
+                        )}
+                      </Link>
 
-                    <div className="mt-3 px-1 space-y-1">
-                      <div className="flex justify-between items-baseline gap-2">
-                        <Link href={`/shop/${product.id}`} className="block flex-1 min-w-0">
-                          <h3 className="text-xs md:text-sm font-black uppercase tracking-tight group-hover:text-primary transition-colors truncate">
-                            {product.name}
-                          </h3>
-                        </Link>
-                        <span className="text-xs md:text-sm font-black text-primary shrink-0 font-mono">₹{parseFloat(product.price).toFixed(2)}</span>
+                      <div className="p-4 space-y-1">
+                        <div className="flex justify-between items-baseline gap-3">
+                          <Link href={`/shop/${product.id}`} className="block flex-1 min-w-0">
+                            <h3 className="text-xs md:text-sm font-bold uppercase tracking-tight group-hover:text-primary transition-colors truncate">
+                              {product.name}
+                            </h3>
+                          </Link>
+                          <span className="text-xs md:text-sm font-black text-primary font-mono shrink-0">₹{parseFloat(product.price).toFixed(2)}</span>
+                        </div>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                          {product.category?.name || "Uncategorized"}
+                        </p>
                       </div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                        {product.category?.name || "Uncategorized"}
-                      </p>
-                    </div>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+
+          {/* Load More Button */}
+          {visibleCount < filteredProducts.length && (
+            <div className="flex justify-center mt-12">
+              <Button
+                onClick={() => setVisibleCount((prev) => prev + 30)}
+                variant="outline"
+                className="border-2 font-black uppercase tracking-wider text-xs px-8 h-12 rounded-xl transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary active-scale"
+              >
+                Load More Products
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

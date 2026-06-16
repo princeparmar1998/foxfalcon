@@ -22,7 +22,9 @@ export async function POST(req: Request) {
     }
 
     // Fetch a fallback product to avoid foreign key violations for custom designer items
-    const fallbackProduct = await db.product.findFirst();
+    const fallbackProduct = await db.product.findFirst({
+      where: { deletedAt: null }
+    });
     if (!fallbackProduct) {
       return new NextResponse("Database must contain at least one product to check out", { status: 400 });
     }
@@ -33,6 +35,9 @@ export async function POST(req: Request) {
       const dbProduct = await db.product.findUnique({
         where: { id: item.id }
       });
+      if (dbProduct && dbProduct.deletedAt) {
+        return new NextResponse(`Product "${dbProduct.name}" is no longer available`, { status: 400 });
+      }
       verifiedItems.push({
         ...item,
         dbId: dbProduct ? dbProduct.id : fallbackProduct.id

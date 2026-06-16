@@ -15,7 +15,7 @@ export async function GET(
       },
     });
 
-    if (!product) {
+    if (!product || product.deletedAt || product.name.startsWith("[DELETED]")) {
       return new NextResponse("Product not found", { status: 404 });
     }
 

@@ -12,7 +12,23 @@ export async function GET(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const showTrash = searchParams.get("trash") === "true";
+
     const products = await db.product.findMany({
+      where: showTrash 
+        ? {
+            OR: [
+              { deletedAt: { not: null } },
+              { name: { startsWith: "[DELETED]" } }
+            ]
+          }
+        : {
+            deletedAt: null,
+            NOT: {
+              name: { startsWith: "[DELETED]" }
+            }
+          },
       include: {
         category: true,
       },

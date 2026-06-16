@@ -12,6 +12,10 @@ export async function GET(req: Request) {
       where: {
         categoryId: categoryId || undefined,
         isFeatured: isFeatured === "true" ? true : undefined,
+        deletedAt: null,
+        NOT: {
+          name: { startsWith: "[DELETED]" }
+        }
       },
       include: {
         category: true,

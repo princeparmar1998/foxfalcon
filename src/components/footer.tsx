@@ -31,7 +31,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <h4 className="text-xs font-black uppercase tracking-widest text-foreground mb-6">Shop</h4>
+          <h4 className="text-xs font-sans font-black uppercase tracking-widest text-foreground mb-6">Shop</h4>
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li><Link href="/shop/men" className="hover:text-primary transition-colors duration-300">Men's Wear</Link></li>
             <li><Link href="/shop/women" className="hover:text-primary transition-colors duration-300">Women's Wear</Link></li>
@@ -41,7 +41,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <h4 className="text-xs font-black uppercase tracking-widest text-foreground mb-6">Customer Service</h4>
+          <h4 className="text-xs font-sans font-black uppercase tracking-widest text-foreground mb-6">Customer Service</h4>
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li><Link href="/contact" className="hover:text-primary transition-colors duration-300">Contact Us</Link></li>
             <li><Link href="/shipping" className="hover:text-primary transition-colors duration-300">Shipping Info</Link></li>
@@ -51,7 +51,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <h4 className="text-xs font-black uppercase tracking-widest text-foreground mb-6">Newsletter</h4>
+          <h4 className="text-xs font-sans font-black uppercase tracking-widest text-foreground mb-6">Newsletter</h4>
           <p className="text-sm text-muted-foreground mb-4 leading-relaxed">Subscribe to get special offers and once-in-a-lifetime deals.</p>
           <div className="flex gap-2">
             <input 
@@ -67,9 +67,20 @@ const Footer = () => {
       </div>
 
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Fox Falcon. All rights reserved.
-        </p>
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Fox Falcon. All rights reserved.
+          </p>
+          <div className="hidden md:block w-px h-3 bg-border" />
+          <div className="flex gap-4">
+            <Link href="/terms" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+              Privacy Policy
+            </Link>
+          </div>
+        </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="text-xs font-medium hover:text-primary transition-colors cursor-pointer group"

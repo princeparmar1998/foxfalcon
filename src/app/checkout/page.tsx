@@ -460,7 +460,7 @@ export default function CheckoutPage() {
                   <CreditCard className="w-4.5 h-4.5" />
                 </div>
                 <div>
-                  <p className="font-black text-xs uppercase tracking-widest text-foreground">Credit / Debit Card</p>
+                  <p className="font-sans font-black text-xs uppercase tracking-widest text-foreground">Credit / Debit Card</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">Pay securely with dummy card details</p>
                 </div>
               </button>
@@ -480,7 +480,7 @@ export default function CheckoutPage() {
                   <Truck className="w-4.5 h-4.5" />
                 </div>
                 <div>
-                  <p className="font-black text-xs uppercase tracking-widest text-foreground">Cash on Delivery (COD)</p>
+                  <p className="font-sans font-black text-xs uppercase tracking-widest text-foreground">Cash on Delivery (COD)</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">Pay in cash when order is delivered</p>
                 </div>
               </button>
