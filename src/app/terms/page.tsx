@@ -2,6 +2,12 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, Scale, FileText, Globe } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service | Fox Falcon",
+  description: "Review the Fox Falcon terms of service governing user accounts, dynamic print customization, simulated purchases, and our rewards system.",
+};
 
 export default function TermsPage() {
   return (

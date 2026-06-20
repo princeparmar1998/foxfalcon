@@ -71,8 +71,8 @@ const config: Config = {
         glowDark: "0 0 25px rgba(255, 106, 0, 0.15)",
       },
       fontFamily: {
-        sans: ["Archivo", "Inter", "sans-serif"],
-        serif: ["Relona", "Cormorant Garamond", "serif"],
+        sans: ["var(--font-archivo)", "Inter", "sans-serif"],
+        serif: ["Relona", "var(--font-cormorant)", "serif"],
       },
       keyframes: {
         "accordion-down": {

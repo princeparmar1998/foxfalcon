@@ -42,7 +42,7 @@ const Navbar = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -171,16 +171,16 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Logo & Sub-Branding */}
           <Link href="/" className="flex flex-col items-center gap-0 group shrink-0">
-            <div className="relative w-14 h-14 transition-transform duration-300 group-hover:scale-105">
+            <div className="w-10 h-7 transition-transform duration-300 group-hover:scale-105">
               <Image
-                src="/logo-icon.png?v=2"
-                fill
+                src="/logo-icon.png?v=7"
+                width={40}
+                height={28}
                 alt="Fox Falcon Logo"
-                className={cn("object-contain transition-all duration-300", showTransparent ? "brightness-100" : "dark:brightness-100 brightness-0")}
-                unoptimized
+                className={cn("object-contain transition-all duration-300", showTransparent ? "brightness-100" : "dark:brightness-100 invert dark:invert-0")}
               />
             </div>
-            <span className="font-sans font-black tracking-[0.18em] text-[11px] uppercase select-none text-center leading-none mt-[-8px]">
+            <span className="hidden lg:block font-sans font-black tracking-[0.18em] text-[11px] uppercase select-none text-center leading-none mt-0.5">
               <span className={cn("transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white")}>FOX </span>
               <span className="text-primary">FALCON</span>
             </span>
@@ -208,6 +208,7 @@ const Navbar = () => {
               <input
                 type="text"
                 placeholder="Search..."
+                aria-label="Search products"
                 className={cn(
                   "pl-8 pr-4 py-1 w-full text-[11px] rounded-full border bg-muted/30 focus:outline-none focus:ring-1 focus:ring-primary/40 focus:bg-background transition-all font-sans",
                   showTransparent ? "border-white/20 text-white placeholder-white/40" : "border-border text-foreground placeholder-muted-foreground"
@@ -239,6 +240,7 @@ const Navbar = () => {
               size="icon"
               className={cn("lg:hidden transition-colors duration-300", !showTransparent ? "text-foreground" : "text-white hover:text-white hover:bg-white/10")}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
@@ -265,6 +267,7 @@ const Navbar = () => {
                 <input
                   type="text"
                   placeholder="Search catalog..."
+                  aria-label="Search catalog"
                   className="pl-10 pr-4 py-2 w-full text-xs rounded-xl border border-border bg-muted/20 focus:outline-none focus:ring-1 focus:ring-primary/40 text-foreground font-sans"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {

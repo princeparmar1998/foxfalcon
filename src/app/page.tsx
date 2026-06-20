@@ -4,28 +4,15 @@ import { ArrowRight, Eye, Shield, RefreshCw, Compass, Sparkles, Heart } from "lu
 import Link from "next/link";
 import Image from "next/image";
 import { LoyaltyCard } from "@/components/LoyaltyCard";
-import { db } from "@/lib/db";
+import { getCachedProducts } from "@/lib/queries";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProductCarousel } from "@/components/ProductCarousel";
 import { StoreLocatorBanner, MembersBanner, ReferralBanner } from "@/components/HomeBanners";
 
 export default async function Home() {
-  // Fetch active products from the database
-  const dbProducts = await db.product.findMany({
-    where: {
-      deletedAt: null,
-      NOT: {
-        name: { startsWith: "[DELETED]" }
-      }
-    },
-    include: {
-      category: true
-    },
-    orderBy: {
-      createdAt: "desc"
-    }
-  });
+  // Fetch active products from the database (cached)
+  const dbProducts = await getCachedProducts();
 
   // Safe mapping of decimal price
   const products = dbProducts.map(p => ({
@@ -105,8 +92,66 @@ export default async function Home() {
       {/* Hero Section */}
       <Hero />
 
-      {/* Loyalty Reward Card */}
-      <LoyaltyCard />
+
+      {/* Categories Row Section (3 category cards in a single row) */}
+      <section className="container px-6 mx-auto">
+        <div className="flex flex-col mb-12">
+          <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2">Curated Drops</span>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none">THE RANGE</h2>
+          <p className="text-muted-foreground mt-2 max-w-md">Filter your aesthetic. Premium heavyweight garments designed for high-street comfort with a subtle riding edge.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link href="/shop?category=t-shirts" className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card border border-border/20 shadow-premium">
+            <Image 
+              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" 
+              alt="Oversized Tees Category"
+              fill
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition-colors duration-300" />
+            <div className="absolute inset-x-6 bottom-6 flex flex-col items-start text-white gap-2">
+              <h3 className="text-2xl font-black uppercase tracking-tight">Oversized Tees</h3>
+              <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-white pb-1 group-hover:text-primary group-hover:border-primary transition-colors">
+                Explore Collection
+              </span>
+            </div>
+          </Link>
+          <Link href="/shop?category=hoodies" className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card border border-border/20 shadow-premium">
+            <Image 
+              src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop" 
+              alt="Urban Hoodies Category"
+              fill
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition-colors duration-300" />
+            <div className="absolute inset-x-6 bottom-6 flex flex-col items-start text-white gap-2">
+              <h3 className="text-2xl font-black uppercase tracking-tight">Urban Hoodies</h3>
+              <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-white pb-1 group-hover:text-primary group-hover:border-primary transition-colors">
+                Explore Collection
+              </span>
+            </div>
+          </Link>
+          <Link href="/shop?category=jackets" className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card border border-border/20 shadow-premium">
+            <Image 
+              src="https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&auto=format&fit=crop" 
+              alt="Rider Outerwear Category"
+              fill
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition-colors duration-300" />
+            <div className="absolute inset-x-6 bottom-6 flex flex-col items-start text-white gap-2">
+              <h3 className="text-2xl font-black uppercase tracking-tight">Rider Jackets</h3>
+              <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-white pb-1 group-hover:text-primary group-hover:border-primary transition-colors">
+                Explore Collection
+              </span>
+            </div>
+          </Link>
+        </div>
+      </section>
 
       {/* Brand Ethos / Banner */}
       <section className="container px-6 mx-auto">
@@ -132,66 +177,6 @@ export default async function Home() {
               <p className="text-sm text-muted-foreground mt-1">Integrating a 30% subtle riding aesthetic—inspired by speed, freedom, and the classic cafe racer heritage.</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Categories Row Section (3 category cards in a single row) */}
-      <section className="container px-6 mx-auto">
-        <div className="flex flex-col mb-12">
-          <span className="text-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2">Curated Drops</span>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none">THE RANGE</h2>
-          <p className="text-muted-foreground mt-2 max-w-md">Filter your aesthetic. Premium heavyweight garments designed for high-street comfort with a subtle riding edge.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link href="/shop?category=t-shirts" className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card border border-border/20 shadow-premium">
-            <Image 
-              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop" 
-              alt="Oversized Tees Category"
-              fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition-colors duration-300" />
-            <div className="absolute inset-x-6 bottom-6 flex flex-col items-start text-white gap-2">
-              <h3 className="text-2xl font-black uppercase tracking-tight">Oversized Tees</h3>
-              <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-white pb-1 group-hover:text-primary group-hover:border-primary transition-colors">
-                Explore Collection
-              </span>
-            </div>
-          </Link>
-          <Link href="/shop?category=hoodies" className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card border border-border/20 shadow-premium">
-            <Image 
-              src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop" 
-              alt="Urban Hoodies Category"
-              fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition-colors duration-300" />
-            <div className="absolute inset-x-6 bottom-6 flex flex-col items-start text-white gap-2">
-              <h3 className="text-2xl font-black uppercase tracking-tight">Urban Hoodies</h3>
-              <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-white pb-1 group-hover:text-primary group-hover:border-primary transition-colors">
-                Explore Collection
-              </span>
-            </div>
-          </Link>
-          <Link href="/shop?category=jackets" className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-card border border-border/20 shadow-premium">
-            <Image 
-              src="https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&auto=format&fit=crop" 
-              alt="Rider Outerwear Category"
-              fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/45 transition-colors duration-300" />
-            <div className="absolute inset-x-6 bottom-6 flex flex-col items-start text-white gap-2">
-              <h3 className="text-2xl font-black uppercase tracking-tight">Rider Jackets</h3>
-              <span className="text-[10px] font-black uppercase tracking-widest border-b-2 border-white pb-1 group-hover:text-primary group-hover:border-primary transition-colors">
-                Explore Collection
-              </span>
-            </div>
-          </Link>
         </div>
       </section>
 
@@ -263,12 +248,12 @@ export default async function Home() {
               </p>
               <div className="flex items-center gap-6 pt-4">
                 <div>
-                  <h5 className="text-primary text-3xl font-black">70%</h5>
+                  <p className="text-primary text-3xl font-black">70%</p>
                   <span className="text-[10px] uppercase text-background/60 font-bold tracking-widest">Streetwear Fashion</span>
                 </div>
                 <div className="h-8 w-px bg-background/20" />
                 <div>
-                  <h5 className="text-primary text-3xl font-black">30%</h5>
+                  <p className="text-primary text-3xl font-black">30%</p>
                   <span className="text-[10px] uppercase text-background/60 font-bold tracking-widest">Riding Subculture</span>
                 </div>
               </div>
@@ -279,7 +264,7 @@ export default async function Home() {
                 alt="Brand Campaign Streetwear"
                 fill
                 className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-                unoptimized
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
@@ -301,6 +286,7 @@ export default async function Home() {
                 src={img.image}
                 alt="Instagram Streetwear Feed"
                 fill
+                sizes="(max-width: 768px) 50vw, 16vw"
                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-110 filter grayscale group-hover:grayscale-0"
               />
               <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -310,6 +296,9 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* Loyalty Reward Card */}
+      <LoyaltyCard />
 
       {/* Custom Design Call to Action */}
       <section className="container px-6 mx-auto">

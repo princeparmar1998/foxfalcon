@@ -2,20 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Heart, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { cn } from "@/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
+
+// Dynamic load for suggestions dialog to save bundle size
+const SimilarProductsDialog = dynamic(
+  () => import("./SimilarProductsDialog").then((m) => m.SimilarProductsDialog),
+  { ssr: false }
+);
 
 interface ProductCarouselProps {
   products: any[];
@@ -81,13 +79,6 @@ export function ProductCarousel({ products, type }: ProductCarouselProps) {
     }
   };
 
-  // Similar items query
-  const displaySimilar = similarProduct
-    ? products
-      .filter(p => p.categoryId === similarProduct.categoryId && p.id !== similarProduct.id)
-      .slice(0, 4)
-    : [];
-
   return (
     <div
       className="relative w-full group"
@@ -126,8 +117,8 @@ export function ProductCarousel({ products, type }: ProductCarouselProps) {
                       src={imageSrc}
                       alt={product.name}
                       fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
                       className="object-cover transition-transform duration-1000 ease-out group-hover:scale-103"
-                      unoptimized
                     />
                   </Link>
 
@@ -144,6 +135,7 @@ export function ProductCarousel({ products, type }: ProductCarouselProps) {
                       });
                     }}
                     className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-background/80 hover:bg-background backdrop-blur-sm border border-border/40 flex items-center justify-center text-foreground hover:text-red-500 transition-colors shadow-sm active:scale-90"
+                    aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
                   >
                     <Heart className={cn("w-4 h-4 transition-transform", isWishlisted ? "fill-red-500 text-red-500 scale-110" : "")} />
                   </button>
@@ -228,75 +220,15 @@ export function ProductCarousel({ products, type }: ProductCarouselProps) {
         }
       `}} />
 
-      {/* Similar Products Dialog */}
-      <Dialog open={!!similarProduct} onOpenChange={(open) => !open && setSimilarProduct(null)}>
-        <DialogContent className="sm:max-w-[550px] bg-background border-border text-foreground rounded-2xl p-6">
-          <DialogHeader className="pb-4 border-b border-border/40">
-            <DialogTitle className="text-2xl font-black uppercase tracking-tighter flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" /> SIMILAR TO {similarProduct?.name}
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
-              Check out other styles in {similarProduct?.category?.name || "this category"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="py-6">
-            {displaySimilar.length === 0 ? (
-              <p className="text-center py-8 text-sm font-bold text-muted-foreground uppercase tracking-wider">
-                No matching similar items found.
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {displaySimilar.map((item) => {
-                  const itemImg = item.images?.[0] || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop";
-                  const itemPrice = typeof item.price === "number" ? item.price : parseFloat(item.price || "0");
-                  return (
-                    <Card key={item.id} className="group relative overflow-hidden bg-card border border-border/40 hover:border-primary/50 transition-all duration-300 rounded-xl flex flex-col p-0">
-                      <Link
-                        href={`/shop/${item.id}`}
-                        onClick={() => setSimilarProduct(null)}
-                        className="block relative aspect-[4/5] overflow-hidden rounded-t-xl bg-muted"
-                      >
-                        <Image
-                          src={itemImg}
-                          alt={item.name}
-                          fill
-                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
-                          unoptimized
-                        />
-                      </Link>
-                      <div className="p-3 space-y-1">
-                        <Link
-                          href={`/shop/${item.id}`}
-                          onClick={() => setSimilarProduct(null)}
-                          className="block text-xs font-bold uppercase tracking-tight group-hover:text-primary transition-colors truncate"
-                        >
-                          {item.name}
-                        </Link>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                            {item.category?.name || "Clothing"}
-                          </span>
-                          <span className="text-xs font-black text-primary font-mono">₹{itemPrice.toFixed(0)}</span>
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-          <div className="flex justify-end pt-4 border-t border-border/40">
-            <Button
-              variant="outline"
-              onClick={() => setSimilarProduct(null)}
-              className="border-2 font-black uppercase tracking-wider text-xs rounded-xl h-10 px-6"
-            >
-              Close Window
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Similar Products Dialog - Dynamically Loaded */}
+      {similarProduct && (
+        <SimilarProductsDialog
+          isOpen={!!similarProduct}
+          onClose={() => setSimilarProduct(null)}
+          similarProduct={similarProduct}
+          products={products}
+        />
+      )}
     </div>
   );
 }

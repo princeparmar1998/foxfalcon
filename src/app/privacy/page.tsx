@@ -2,6 +2,12 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, Lock, Eye, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Fox Falcon",
+  description: "Read the Fox Falcon privacy policy to understand how we safeguard your personal information, customized artwork, and transaction history.",
+};
 
 export default function PrivacyPage() {
   return (

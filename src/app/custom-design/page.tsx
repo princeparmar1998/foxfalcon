@@ -101,7 +101,7 @@ export default function CustomDesignPage() {
                   fill
                   className="object-contain mix-blend-multiply opacity-40 pointer-events-none"
                   priority
-                  unoptimized
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 
                 {/* Uploaded Design Overlay */}
@@ -222,8 +222,9 @@ export default function CustomDesignPage() {
 
             {/* Design Uploader */}
             <div className="space-y-3">
-              <label className="text-xs font-sans font-black uppercase tracking-widest text-muted-foreground">3. Upload Transparency Artwork</label>
+              <label htmlFor="artwork-upload" className="text-xs font-sans font-black uppercase tracking-widest text-muted-foreground">3. Upload Transparency Artwork</label>
               <input 
+                id="artwork-upload"
                 type="file" 
                 ref={fileInputRef}
                 onChange={handleImageUpload}
