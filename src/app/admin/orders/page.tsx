@@ -11,8 +11,10 @@ import {
   Clock,
   Loader2,
   Package,
-  MapPin
+  MapPin,
+  Trash2
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -36,6 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { adminApi } from "@/lib/api";
@@ -47,6 +50,10 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [ordersToDelete, setOrdersToDelete] = useState<string[]>([]);
 
   // Fetch orders from db
   const fetchOrders = async () => {
@@ -54,6 +61,7 @@ export default function AdminOrdersPage() {
       setLoading(true);
       const data = await adminApi.getOrders();
       setOrders(data);
+      setSelectedOrderIds(prev => prev.filter(id => data.some((o: any) => o.id === id)));
     } catch (err) {
       showToast.error("Failed to load orders", err);
     } finally {
@@ -86,6 +94,36 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const handleSelectAll = (checked: any) => {
+    if (checked) {
+      const visibleIds = filteredOrders.map(o => o.id);
+      setSelectedOrderIds(prev => Array.from(new Set([...prev, ...visibleIds])));
+    } else {
+      const visibleIds = filteredOrders.map(o => o.id);
+      setSelectedOrderIds(prev => prev.filter(id => !visibleIds.includes(id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (ordersToDelete.length === 0) return;
+    const toastId = showToast.loading(`Deleting ${ordersToDelete.length} order(s)...`);
+    setDeleting(true);
+    try {
+      await adminApi.deleteOrders(ordersToDelete);
+      showToast.dismiss(toastId);
+      showToast.success(`Successfully deleted ${ordersToDelete.length} order(s)!`);
+      setSelectedOrderIds(prev => prev.filter(id => !ordersToDelete.includes(id)));
+      fetchOrders();
+    } catch (err) {
+      showToast.dismiss(toastId);
+      showToast.error("Failed to delete orders", err);
+    } finally {
+      setDeleting(false);
+      setIsConfirmDeleteOpen(false);
+      setOrdersToDelete([]);
+    }
+  };
+
   const filteredOrders = orders.filter(order =>
     order.id.toLowerCase().includes(search.toLowerCase()) ||
     order.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -102,8 +140,8 @@ export default function AdminOrdersPage() {
       </div>
 
       <Card className="p-6 border-border bg-card">
-        <div className="flex flex-col md:flex-row justify-between gap-4 mb-8">
-          <div className="relative flex-1 max-w-md">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="relative flex-1 max-w-md w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search orders by ID, name or email..."
@@ -111,6 +149,40 @@ export default function AdminOrdersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            {selectedOrderIds.length > 0 && (
+              <Button
+                variant="destructive"
+                className="font-bold flex items-center gap-2 border-2 border-red-500/20"
+                onClick={() => {
+                  setOrdersToDelete(selectedOrderIds);
+                  setIsConfirmDeleteOpen(true);
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete Selected ({selectedOrderIds.length})
+              </Button>
+            )}
+
+            <Button
+              variant="outline"
+              className="font-bold border-2 border-border hover:bg-muted"
+              onClick={() => {
+                const endedIds = orders
+                  .filter((o) => ["COMPLETED", "CANCELLED", "REJECTED"].includes(o.status))
+                  .map((o) => o.id);
+                if (endedIds.length === 0) {
+                  showToast.error("No completed, cancelled, or rejected orders to clean up.");
+                  return;
+                }
+                setOrdersToDelete(endedIds);
+                setIsConfirmDeleteOpen(true);
+              }}
+            >
+              Clean Up Ended Orders
+            </Button>
           </div>
         </div>
 
@@ -129,6 +201,16 @@ export default function AdminOrdersPage() {
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-border">
+                  <TableHead className="w-[50px] font-bold">
+                    <Checkbox
+                      checked={
+                        filteredOrders.length > 0 &&
+                        filteredOrders.every((o) => selectedOrderIds.includes(o.id))
+                      }
+                      onCheckedChange={handleSelectAll}
+                      aria-label="Select all orders"
+                    />
+                  </TableHead>
                   <TableHead className="font-bold">Order ID</TableHead>
                   <TableHead className="font-bold">Customer</TableHead>
                   <TableHead className="font-bold">Date & Time</TableHead>
@@ -148,6 +230,19 @@ export default function AdminOrdersPage() {
 
                   return (
                     <TableRow key={order.id} className="border-border hover:bg-muted/50 transition-colors group">
+                      <TableCell className="w-[50px]">
+                        <Checkbox
+                          checked={selectedOrderIds.includes(order.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedOrderIds((prev) => [...prev, order.id]);
+                            } else {
+                              setSelectedOrderIds((prev) => prev.filter((id) => id !== order.id));
+                            }
+                          }}
+                          aria-label={`Select order ${order.id}`}
+                        />
+                      </TableCell>
                       <TableCell className="font-black">{order.id}</TableCell>
                       <TableCell>
                         <div className="font-bold">{order.user?.name || "Anonymous"}</div>
@@ -317,6 +412,57 @@ export default function AdminOrdersPage() {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={isConfirmDeleteOpen} onOpenChange={(open) => {
+        setIsConfirmDeleteOpen(open);
+        if (!open) setOrdersToDelete([]);
+      }}>
+        <DialogContent className="sm:max-w-[450px] bg-background border-border">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black text-destructive flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-500" />
+              CONFIRM DELETE
+            </DialogTitle>
+            <DialogDescription className="text-sm mt-2">
+              Are you sure you want to permanently delete <strong className="text-foreground">{ordersToDelete.length}</strong> selected order(s)?
+              <br /><br />
+              <span className="text-red-500 font-bold block bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                This action is permanent and will delete the selected order records along with their purchased item histories. This cannot be undone.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="mt-6 flex justify-end gap-2">
+            <Button
+              variant="outline"
+              disabled={deleting}
+              onClick={() => {
+                setIsConfirmDeleteOpen(false);
+                setOrdersToDelete([]);
+              }}
+              className="border-2 font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleting}
+              onClick={handleBulkDelete}
+              className="font-bold bg-red-600 hover:bg-red-700 text-white border-none px-4"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                "Yes, Delete Forever"
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, User, Menu, X, Search, LogOut, ShieldAlert, ShoppingBag, MapPin, HelpCircle, Settings, ArrowRight } from "lucide-react";
+import { Heart, User, Menu, X, Search, LogOut, ShieldAlert, ShoppingBag, MapPin, HelpCircle, Settings, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "next-auth/react";
@@ -71,12 +71,17 @@ const Navbar = () => {
               <span>CONTACT US</span>
             </Link>
             <span className="text-white/20">|</span>
+            <Link href={session ? "/orders" : "/login"} className="flex items-center gap-1.5 hover:text-primary transition-colors">
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>MY ORDERS</span>
+            </Link>
+            <span className="text-white/20">|</span>
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-1.5 hover:text-primary transition-colors uppercase focus:outline-none font-bold">
                     <User className="w-3.5 h-3.5" />
-                    <span>{session.user?.name?.split(" ")[0] || "PROFILE"}</span>
+                    <span className="text-primary font-black drop-shadow-[0_0_6px_rgba(var(--primary-rgb,200,170,110),0.5)]">{session.user?.name?.split(" ")[0] || "PROFILE"}</span>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80 bg-card border border-border rounded-3xl p-6 shadow-2xl space-y-6 text-card-foreground mt-2">
@@ -111,6 +116,18 @@ const Navbar = () => {
 
                   {/* Additional Actions Divider */}
                   <div className="border-t border-border pt-4 space-y-2">
+                    <DropdownMenuItem asChild className="cursor-pointer font-bold focus:bg-muted rounded-xl px-4 py-2.5 text-foreground font-sans">
+                      <Link href="/orders" className="flex items-center w-full justify-between">
+                        <span className="flex items-center"><ShoppingBag className="w-4 h-4 mr-3 text-primary" /> My Orders</span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer font-bold focus:bg-muted rounded-xl px-4 py-2.5 text-foreground font-sans">
+                      <Link href="/shop" className="flex items-center w-full justify-between">
+                        <span className="flex items-center"><Sparkles className="w-4 h-4 mr-3 text-primary" /> Shop</span>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                      </Link>
+                    </DropdownMenuItem>
                     {session.user?.role === "ADMIN" && (
                       <DropdownMenuItem asChild className="cursor-pointer font-bold focus:bg-muted rounded-xl px-4 py-2.5 text-foreground font-sans">
                         <Link href="/admin" className="flex items-center w-full justify-between">

@@ -61,4 +61,6 @@ export const adminApi = {
   getCustomers: () => api.get("/api/admin/customers").then((res) => res.data),
   getReviews: () => api.get("/api/admin/reviews").then((res) => res.data),
   deleteReview: (id: string) => api.delete(`/api/admin/reviews?id=${id}`).then((res) => res.data),
+  deleteOrders: (orderIds: string[]) =>
+    api.delete("/api/admin/orders", { data: { orderIds } }).then((res) => res.data),
 };

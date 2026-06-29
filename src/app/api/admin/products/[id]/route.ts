@@ -28,9 +28,9 @@ export async function DELETE(
     if (!isTrashed) {
       const product = await db.product.update({
         where: { id: params.id },
-        data: { 
+        data: {
           deletedAt: new Date(),
-          isFeatured: false 
+          isFeatured: false
         },
       });
       return NextResponse.json({ ...product, softDeleted: true });
