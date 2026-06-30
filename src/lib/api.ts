@@ -64,3 +64,23 @@ export const adminApi = {
   deleteOrders: (orderIds: string[]) =>
     api.delete("/api/admin/orders", { data: { orderIds } }).then((res) => res.data),
 };
+
+export const aiApi = {
+  getSettings: () => api.get("/api/admin/ai/settings").then((res) => res.data),
+  saveSettings: (settings: any) => api.post("/api/admin/ai/settings", settings).then((res) => res.data),
+  getTasks: () => api.get("/api/admin/ai/tasks").then((res) => res.data),
+  createTask: (instruction: string) => api.post("/api/admin/ai/tasks", { instruction }).then((res) => res.data),
+  approveTask: (taskId: string) => api.post("/api/admin/ai/tasks", { action: "approve", taskId }).then((res) => res.data),
+  rejectTask: (taskId: string, feedback: string) => api.post("/api/admin/ai/tasks", { action: "reject", taskId, feedback }).then((res) => res.data),
+  getMemory: () => api.get("/api/admin/ai/workspace").then((res) => res.data),
+  addMemory: (category: string, content: string, tags: string[]) => api.post("/api/admin/ai/workspace", { category, content, tags }).then((res) => res.data),
+  generateTags: (formData: FormData) => api.post("/api/admin/ai/tags-generator", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  }).then((res) => res.data),
+  getTrendingHashtags: () => api.get("/api/admin/ai/trending-hashtags").then((res) => res.data),
+  saveFinalizedTags: (data: any) => api.post("/api/admin/ai/tags-generator/save", data).then((res) => res.data),
+  getSavedTagHistory: () => api.get("/api/admin/ai/tags-generator/history").then((res) => res.data),
+  updateFinalizedTags: (data: any) => api.put("/api/admin/ai/tags-generator", data).then((res) => res.data),
+  deleteFinalizedTags: (id: string) => api.delete(`/api/admin/ai/tags-generator?id=${id}`).then((res) => res.data),
+};
+

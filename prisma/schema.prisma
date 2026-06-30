@@ -176,3 +176,24 @@ model Review {
 
   @@unique([userId, productId]) // Limit to one review per product per user
 }
+
+model AiImageTags {
+  id          String   @id @default(cuid())
+  imageUrl    String
+  title       String
+  tags        String[]
+  hashtags    String[]
+  caption     String   @db.Text
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TrendingHashtag {
+  id         String   @id @default(cuid())
+  tag        String   @unique
+  popularity Int      @default(1)
+  category   String   @default("general")
+  createdAt  DateTime @default(now())
+}
+

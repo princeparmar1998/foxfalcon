@@ -11,7 +11,8 @@ import {
   Settings,
   Menu,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Cpu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ const sidebarLinks = [
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { name: "AI Support", href: "/admin/ai", icon: Cpu },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

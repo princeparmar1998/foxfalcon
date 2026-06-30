@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { BarChart3, TrendingUp, ShoppingBag, Users, DollarSign, Package, Loader2 } from "lucide-react";
+import { BarChart3, TrendingUp, ShoppingBag, Users, IndianRupee, Package, Loader2 } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 
@@ -78,7 +78,7 @@ export default function AdminAnalyticsPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total Revenue", value: `$${stats?.totalRevenue?.toLocaleString("en-US", { minimumFractionDigits: 2 }) ?? "0.00"}`, icon: DollarSign, color: "text-green-500", glow: "hover:shadow-[0_0_20px_rgba(34,197,94,0.1)] hover:border-green-500/30" },
+          { label: "Total Revenue", value: `₹${stats?.totalRevenue?.toLocaleString("en-IN", { minimumFractionDigits: 2 }) ?? "0.00"}`, icon: IndianRupee, color: "text-green-500", glow: "hover:shadow-[0_0_20px_rgba(34,197,94,0.1)] hover:border-green-500/30" },
           { label: "Total Orders", value: stats?.totalOrders ?? 0, icon: ShoppingBag, color: "text-primary", glow: "hover:shadow-[0_0_20px_rgba(249,115,22,0.1)] hover:border-primary/30" },
           { label: "Total Customers", value: stats?.totalCustomers ?? 0, icon: Users, color: "text-blue-500", glow: "hover:shadow-[0_0_20px_rgba(59,130,246,0.1)] hover:border-blue-500/30" },
           { label: "Products Listed", value: stats?.totalProducts ?? 0, icon: Package, color: "text-purple-500", glow: "hover:shadow-[0_0_20px_rgba(168,85,247,0.1)] hover:border-purple-500/30" },
@@ -182,7 +182,7 @@ export default function AdminAnalyticsPage() {
             <div key={status} className="p-4 rounded-xl bg-muted/30 border border-border text-center hover:border-primary/20 transition-all duration-300">
               <div className={cn("w-2 h-2 rounded-full mx-auto mb-2", statusColors[status])} />
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{status}</p>
-              <p className="text-xl font-black text-foreground font-mono">${(revenueByStatus[status] || 0).toFixed(2)}</p>
+              <p className="text-xl font-black text-foreground font-mono">₹{(revenueByStatus[status] || 0).toFixed(2)}</p>
             </div>
           ))}
         </div>

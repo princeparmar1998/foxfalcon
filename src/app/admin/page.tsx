@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   TrendingUp,
   TrendingDown,
-  DollarSign,
+  IndianRupee,
   ShoppingBag,
   Users,
   Package,
@@ -29,9 +29,31 @@ import { adminApi } from "@/lib/api";
 import { showToast } from "@/lib/toast";
 import Link from "next/link";
 
+interface DashboardStats {
+  totalRevenue: number;
+  revenueChange: number;
+  totalOrders: number;
+  ordersChange: number;
+  totalCustomers: number;
+  customersChange: number;
+  totalProducts: number;
+  outOfStock: number;
+}
+
+interface Order {
+  id: string;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  user: {
+    name: string | null;
+    email: string;
+  };
+}
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
@@ -68,8 +90,8 @@ export default function AdminDashboard() {
     ? [
       {
         label: "Total Revenue",
-        value: `$${stats.totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        icon: DollarSign,
+        value: `₹${stats.totalRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        icon: IndianRupee,
         change: `${stats.revenueChange >= 0 ? "+" : ""}${stats.revenueChange}%`,
         trending: stats.revenueChange >= 0 ? "up" : "down",
       },
@@ -211,7 +233,7 @@ export default function AdminDashboard() {
                         {order.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-black">${parseFloat(order.totalAmount).toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-black">${Number(order.totalAmount).toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

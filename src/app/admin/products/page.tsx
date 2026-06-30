@@ -346,7 +346,7 @@ export default function AdminProductsPage() {
       {
         "name": "Oversized Falcon Graphic Tee",
         "categoryName": "T-Shirts",
-        "price": "45.00",
+        "price": "1499.00",
         "inventory": "100",
         "description": "Heavyweight vintage-washed custom graphic streetwear tee with drop-shoulder detail.",
         "sizes": ["S", "M", "L", "XL", "XXL"],
@@ -357,7 +357,7 @@ export default function AdminProductsPage() {
       {
         "name": "Falcon Stealth Utility Cargo",
         "categoryName": "Pants",
-        "price": "95.00",
+        "price": "3999.00",
         "inventory": "75",
         "description": "Premium utility multi-pocket cargo pants featuring straps and durable zippers.",
         "sizes": ["M", "L", "XL"],
@@ -371,8 +371,8 @@ export default function AdminProductsPage() {
   };
 
   const handleLoadSampleCSV = () => {
-    const sample = `Streetwear Acid Tee,T-Shirts,49.99,120,Acid washed organic cotton drop shoulder tee,S;M;L;XL,Acid Black;Acid Wash,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop
-Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility windbreaker,M;L;XL,Carbon Black,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop`;
+    const sample = `Streetwear Acid Tee,T-Shirts,1499.00,120,Acid washed organic cotton drop shoulder tee,S;M;L;XL,Acid Black;Acid Wash,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop
+Stealth Tech Windbreaker,Hoodies,3999.00,40,Lightweight water resistant utility windbreaker,M;L;XL,Carbon Black,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop`;
     setBulkInput(sample);
     setBulkFormat("csv");
   };
@@ -514,7 +514,7 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                           {product.category?.name || "T-Shirts"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-black text-primary">${parseFloat(product.price).toFixed(2)}</TableCell>
+                      <TableCell className="font-black text-primary">₹{parseFloat(product.price).toFixed(2)}</TableCell>
                       <TableCell className="font-bold">{product.inventory}</TableCell>
                       <TableCell>
                         <Badge
@@ -666,13 +666,13 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-1.5">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Price ($) *</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Price (₹) *</label>
                     <div className="relative group inline-block">
                       <HelpCircle className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-popover border border-border text-popover-foreground text-[10px] font-medium p-3 rounded-lg shadow-2xl w-64 text-left normal-case leading-relaxed z-50">
                         <div className="font-bold text-primary mb-1 uppercase tracking-wider">💡 Price Optimization</div>
                         <ul className="space-y-1 text-muted-foreground">
-                          <li>• <strong>$100</strong> ki jagah <strong>$99</strong> ya <strong>$99.99</strong> likhein (Psychological Pricing).</li>
+                          <li>• <strong>₹1000</strong> ki jagah <strong>₹999</strong> ya <strong>₹999.00</strong> likhein (Psychological Pricing).</li>
                           <li>• <strong>Discount</strong> word ki jagah <strong>"Special Offer"</strong> bolein.</li>
                         </ul>
                       </div>
@@ -681,7 +681,7 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                   <Input
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 59.99"
+                    placeholder="e.g. 2999.00"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     required
@@ -1009,7 +1009,7 @@ Stealth Tech Windbreaker,Hoodies,119.99,40,Lightweight water resistant utility w
                             <TableCell className="py-2">
                               <Badge variant="secondary" className="text-[8px] font-bold">{p.categoryName}</Badge>
                             </TableCell>
-                            <TableCell className="font-black text-primary py-2">${parseFloat(p.price).toFixed(2)}</TableCell>
+                            <TableCell className="font-black text-primary py-2">₹{parseFloat(p.price).toFixed(2)}</TableCell>
                             <TableCell className="font-bold py-2">{p.inventory}</TableCell>
                             <TableCell className="text-right py-2 text-[10px] text-muted-foreground font-semibold">{p.sizes.join(",")}</TableCell>
                           </TableRow>
